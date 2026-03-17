@@ -17,6 +17,7 @@ export const ministries: Ministry[] = [
   { id: 'mofa', name: '外務省', nameEn: 'MOFA' },
   { id: 'env', name: '環境省', nameEn: 'MOE' },
   { id: 'maff', name: '農林水産省', nameEn: 'MAFF' },
+  { id: 'cfa', name: 'こども家庭庁', nameEn: 'CFA' },
 ];
 
 export interface PolicyTheme {
@@ -142,7 +143,7 @@ export const mockIdeas: Idea[] = [
   {
     id: '1',
     title: 'AI窓口アシスタント「まど助」',
-    description: '市区町村の窓口業務をAIがサポート。住民からの問い合わせに24時間対応し、必要書類の案内や手続きのナビゲーションを行う。多言語対応で外国人住民にも対応。',
+    description: '市区町村の窓口業務をAIがサポート。住民から���問い合わせに24時間対応し、必要書類の案内や手続きのナビゲーションを行う。多言語対応で外国人住民にも対応。',
     category: 'AI・自動化',
     feasibility: 75,
     impact: 82,
@@ -245,7 +246,7 @@ export const mockScoredIdeas: ScoredIdea[] = mockIdeas.map((idea) => {
 
 function getReasoningForIdea(id: string): string {
   const reasonings: Record<string, string> = {
-    '1': '既存のAI技術を活用でき、住民サービス向上への即効性が高い。多言語対応により外国人住民へのアプローチも可能。',
+    '1': '既存のAI技術を活用でき、住民サービス向上への即効��が高い。多言語対応により外国人住民へのアプローチも可能。',
     '2': '文書管理の効率化は全省庁共通の課題であり、横展開が容易。LLM技術の成熟により実現可能性が向上。',
     '3': '防災は国民の関心が高く、社会的インパクト大。一方で複数機関との連携が必要で実装には時間を要する。',
     '4': '技術的難易度は低いが、既存システムとの統合が課題。利用者の利便性向上効果は確実。',
