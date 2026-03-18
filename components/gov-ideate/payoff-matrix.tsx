@@ -40,18 +40,18 @@ export function PayoffMatrix({
   }, [ideas]);
   
   const getQuadrantColor = (quadrant: string, isSelected: boolean) => {
-    if (isSelected) return 'hsl(var(--primary))';
+    if (isSelected) return '#3b82f6'; // primary blue
     switch (quadrant) {
       case 'quick-win':
-        return 'hsl(var(--score-high))';
+        return '#22c55e'; // green
       case 'moonshot':
-        return 'hsl(var(--primary))';
+        return '#3b82f6'; // blue
       case 'core':
-        return 'hsl(var(--muted-foreground))';
+        return '#6b7280'; // gray
       case 'low-priority':
-        return 'hsl(var(--score-low))';
+        return '#ef4444'; // red
       default:
-        return 'hsl(var(--muted-foreground))';
+        return '#6b7280'; // gray
     }
   };
   
