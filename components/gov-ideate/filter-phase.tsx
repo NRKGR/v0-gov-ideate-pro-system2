@@ -1,13 +1,13 @@
 'use client';
 
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ArrowUpDown, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { AgentCard } from './agent-card';
-import { PayoffMatrix } from './payoff-matrix';
 import { IdeaCard } from './idea-card';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import type { ScoredIdea } from '@/lib/mock-data';
+import { useState } from 'react';
 
 interface FilterPhaseProps {
   ideas: ScoredIdea[];
@@ -24,46 +24,103 @@ export function FilterPhase({
   onComplete,
   className,
 }: FilterPhaseProps) {
-  const topIdeas = [...ideas]
-    .sort((a, b) => b.totalScore - a.totalScore)
-    .slice(0, 5);
+  const [sortBy, setSortBy] = useState<'score' | 'feasibility' | 'impact'>('score');
+  const [filterQuadrant, setFilterQuadrant] = useState<string | null>(null);
+  
+  // Sort and filter ideas
+  const filteredIdeas = [...ideas]
+    .filter(idea => !filterQuadrant || idea.quadrant === filterQuadrant)
+    .sort((a, b) => {
+      switch (sortBy) {
+        case 'feasibility':
+          return b.feasibility - a.feasibility;
+        case 'impact':
+          return b.impact - a.impact;
+        default:
+          return b.totalScore - a.totalScore;
+      }
+    })
+    .slice(0, 20);
+  
+  const quadrantLabels: Record<string, string> = {
+    'quick-win': 'Quick Win',
+    'moonshot': 'Moonshot',
+    'core': 'Sustainable Core',
+    'low-priority': 'Low Priority',
+  };
   
   return (
     <div className={cn('space-y-6', className)}>
       <AgentCard
         name="IDEATE 2"
         nameJa="選別エージェント"
-        description="ペイオフマトリクスによる評価・選別"
+        description="上位20案の比較・絞り込み"
         icon="Filter"
         status="complete"
       >
         <div className="space-y-6">
-          {/* Payoff Matrix */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-foreground">ペイオフマトリクス</h4>
-            <div className="glass-card p-4">
-              <PayoffMatrix
-                ideas={ideas}
-                selectedIdea={selectedIdea}
-                onIdeaSelect={onIdeaSelect}
-              />
+          {/* Filter & Sort Controls */}
+          <div className="flex flex-wrap items-center gap-3">
+            <div className="flex items-center gap-2">
+              <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">並び替え:</span>
+              {(['score', 'feasibility', 'impact'] as const).map((option) => (
+                <Button
+                  key={option}
+                  variant={sortBy === option ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setSortBy(option)}
+                >
+                  {option === 'score' ? 'スコア' : option === 'feasibility' ? '実現性' : 'インパクト'}
+                </Button>
+              ))}
+            </div>
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm text-muted-foreground">象限:</span>
+              <Button
+                variant={filterQuadrant === null ? 'default' : 'outline'}
+                size="sm"
+                onClick={() => setFilterQuadrant(null)}
+              >
+                すべて
+              </Button>
+              {Object.entries(quadrantLabels).map(([key, label]) => (
+                <Button
+                  key={key}
+                  variant={filterQuadrant === key ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setFilterQuadrant(key)}
+                >
+                  {label}
+                </Button>
+              ))}
             </div>
           </div>
           
-          {/* Top Ideas List */}
-          <div className="space-y-3">
-            <h4 className="font-semibold text-foreground">Top 5 候補案</h4>
-            <div className="grid gap-4">
-              {topIdeas.map((idea) => (
-                <IdeaCard
-                  key={idea.id}
-                  idea={idea}
-                  isSelected={selectedIdea?.id === idea.id}
-                  onSelect={onIdeaSelect}
-                  variant="full"
-                />
-              ))}
-            </div>
+          {/* Ideas Count */}
+          <div className="flex items-center justify-between">
+            <h4 className="font-semibold text-foreground">候補案一覧</h4>
+            <Badge variant="outline">{filteredIdeas.length}件表示</Badge>
+          </div>
+          
+          {/* Ideas List */}
+          <div className="grid gap-4">
+            {filteredIdeas.map((idea, index) => (
+              <div key={idea.id} className="flex items-start gap-2">
+                <span className="text-xs font-medium text-muted-foreground w-6 pt-4">
+                  {index + 1}.
+                </span>
+                <div className="flex-1">
+                  <IdeaCard
+                    idea={idea}
+                    isSelected={selectedIdea?.id === idea.id}
+                    onSelect={onIdeaSelect}
+                    variant="full"
+                  />
+                </div>
+              </div>
+            ))}
           </div>
           
           {/* Selected Idea Summary */}
