@@ -4,7 +4,8 @@ import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Zap, Sparkles, ChevronRight, ChevronDown, ChevronUp, Target, AlertTriangle, Footprints, FileText, Lightbulb } from 'lucide-react';
+import { TrendingUp, Zap, Sparkles, ChevronRight, ChevronDown, ChevronUp, Target, AlertTriangle, Footprints, FileText, Lightbulb, BarChart3 } from 'lucide-react';
+import { Progress } from '@/components/ui/progress';
 import { generateIdeaDetails, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeaCardProps {
@@ -165,6 +166,60 @@ export function IdeaCard({
         {/* Expanded Details */}
         {isExpanded && details && (
           <div className="pt-4 space-y-4 border-t border-border/50 animate-in slide-in-from-top-2 duration-200">
+            {/* Evaluation Breakdown - 評価根拠 */}
+            {idea.evaluationBreakdown && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                  <BarChart3 className="h-4 w-4 text-primary" />
+                  評価根拠
+                </div>
+                
+                {/* 実現可能性の内訳 */}
+                <div className="pl-6 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <Zap className="h-4 w-4 text-score-medium" />
+                      実現可能性: {idea.evaluationBreakdown.feasibility.total}/100
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {idea.evaluationBreakdown.feasibility.criteria.map((criterion, i) => (
+                      <div key={i} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">{criterion.name}</span>
+                          <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
+                        </div>
+                        <Progress value={(criterion.score / criterion.maxScore) * 100} className="h-1.5" />
+                        <p className="text-xs text-muted-foreground">{criterion.rationale}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* 影響度の内訳 */}
+                <div className="pl-6 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <TrendingUp className="h-4 w-4 text-score-high" />
+                      影響度: {idea.evaluationBreakdown.impact.total}/100
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {idea.evaluationBreakdown.impact.criteria.map((criterion, i) => (
+                      <div key={i} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">{criterion.name}</span>
+                          <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
+                        </div>
+                        <Progress value={(criterion.score / criterion.maxScore) * 100} className="h-1.5" />
+                        <p className="text-xs text-muted-foreground">{criterion.rationale}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            
             {/* Background */}
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm font-medium text-foreground">
