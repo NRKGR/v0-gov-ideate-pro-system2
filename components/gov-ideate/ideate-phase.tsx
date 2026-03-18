@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { AgentCard } from './agent-card';
 import { IdeaCard } from './idea-card';
+import { IdeasListModal } from './ideas-list-modal';
 import { generate300Ideas, exportIdeasToCSV, downloadCSV, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeatePhaseProps {
@@ -22,13 +23,21 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
   const [generationProgress, setGenerationProgress] = useState(0);
   const [isGenerating, setIsGenerating] = useState(true);
   const [showIdeas, setShowIdeas] = useState(false);
+  const [allIdeas, setAllIdeas] = useState<ScoredIdea[]>([]);
+  
+  // Generate all 300 ideas once when generation completes
+  useEffect(() => {
+    if (!isGenerating && allIdeas.length === 0) {
+      setAllIdeas(generate300Ideas());
+    }
+  }, [isGenerating, allIdeas.length]);
   
   const handleExportCSV = useCallback(() => {
-    const allIdeas = generate300Ideas();
-    const csv = exportIdeasToCSV(allIdeas);
+    const ideasToExport = allIdeas.length > 0 ? allIdeas : generate300Ideas();
+    const csv = exportIdeasToCSV(ideasToExport);
     const timestamp = new Date().toISOString().slice(0, 10);
     downloadCSV(csv, `gov-ideate-300ideas-${timestamp}.csv`);
-  }, []);
+  }, [allIdeas]);
   
   useEffect(() => {
     if (isGenerating) {
@@ -75,6 +84,11 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <IdeasListModal
+                    ideas={allIdeas}
+                    selectedIdea={selectedIdea}
+                    onIdeaSelect={onIdeaSelect}
+                  />
                   <Button 
                     variant="outline" 
                     size="sm"
