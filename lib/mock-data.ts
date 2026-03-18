@@ -53,10 +53,20 @@ export interface Idea {
   tags: string[];
 }
 
+export interface IdeaDetails {
+  background: string;
+  expectedBenefits: string[];
+  requiredResources: string[];
+  risks: string[];
+  implementationSteps: string[];
+  relatedPolicies: string[];
+}
+
 export interface ScoredIdea extends Idea {
   totalScore: number;
   quadrant: 'quick-win' | 'moonshot' | 'core' | 'low-priority';
   reasoning: string;
+  details?: IdeaDetails;
 }
 
 export interface BMCData {
@@ -213,7 +223,7 @@ export const mockIdeas: Idea[] = [
     feasibility: 88,
     impact: 65,
     novelty: 55,
-    tags: ['予約システム', 'データ活用', '利便性����上'],
+    tags: ['予約システム', 'データ活用', '利便性�����上'],
   },
   {
     id: '5',
@@ -404,7 +414,7 @@ export const mockPoolAuditReport: PoolAuditReport = {
   ],
   gaps: [
     '国際連携・海外展開の観点が弱い',
-    '民間企業との協業モデルの深������が不足',
+    '民間企業との協業モデル���深������が不足',
     '長期的な社会変化への対応案が少ない',
   ],
   recommendations: [
@@ -897,4 +907,182 @@ export function findSimilarIdeas(
     .map(({ idea }) => idea);
   
   return scoredIdeas;
+}
+
+// Generate detailed information for an idea
+export function generateIdeaDetails(idea: ScoredIdea): IdeaDetails {
+  // If already has details, return them
+  if (idea.details) {
+    return idea.details;
+  }
+  
+  const backgroundTemplates: Record<string, string> = {
+    'AI・自動化': 'AI技術の急速な発展により、行政業務の自動化・効率化が現実的な選択肢となっています。特に大規模言語モデル（LLM）の進化は、従来は人間にしかできなかった業務を自動化する可能性を広げています。',
+    '市民サービス': '住民のデジタルリテラシー向上と、スマートフォン普及率の上昇により、オンラインでの行政サービス提供への期待が高まっています。特にコロナ禍以降、非対面サービスへのニーズが急増しています。',
+    'データ活用': 'オープンデータ推進や、EBPM（証拠に基づく政策立案）の重要性が認識される中、行政データの利活用は政策立案の質を高める鍵となっています。',
+    '防災・危機管理': '気候変動による災害の激甚化・頻発化を受け、防災・減災対策の高度化が急務となっています。デジタル技術を活用したリアルタイム情報共有や予測システムへの期待が高まっています。',
+    'デジタルデバイド対策': '高齢者や障害者など、デジタル技術へのアクセスが困難な層への支援が社会課題となっています。誰一人取り残さないデジタル社会の実現に向けた取り組みが求められています。',
+    'セキュリティ': 'サイバー攻撃の高度化・巧妙化が進む中、行政機関のセキュリティ対策強化は喫緊の課題です。ゼロトラストセキュリティの考え方が広まりつつあります。',
+    '知識共有': '行政機関間の縦割りを超えた知識共有・連携が課題となっています。成功事例や失敗事例を共有し、効率的な政策立案・実行を目指す動きが活発化しています。',
+    '業務効率化': '働き方改革の推進や人材不足への対応として、行政業務の効率化・デジタル化が求められています。ペーパーレス化やワークフロー自動化への投資が進んでいます。',
+  };
+  
+  const benefitsTemplates: Record<string, string[]> = {
+    'AI・自動化': [
+      '業務処理時間の大幅な削減（推定30-50%）',
+      '24時間365日の対応が可能に',
+      '人的ミスの削減と品質の均一化',
+      '職員の高付加価値業務へのシフト',
+      'コスト削減効果（中長期）',
+    ],
+    '市民サービス': [
+      '住民の利便性向上（来庁不要）',
+      '待ち時間の解消',
+      '手続きの透明性向上',
+      'サービスアクセスの公平性確保',
+      '住民満足度の向上',
+    ],
+    'データ活用': [
+      '政策効果の可視化・定量評価',
+      'データに基づく意思決定の促進',
+      '予測分析による先手対応',
+      '部署間連携の強化',
+      'イノベーション創出の基盤構築',
+    ],
+    '防災・危機管理': [
+      '迅速な情報伝達による被害軽減',
+      '避難行動の最適化',
+      '資源配分の効率化',
+      '復旧・復興の迅速化',
+      '平時からの備えの強化',
+    ],
+    'デジタルデバイド対策': [
+      'デジタルサービスへのアクセス拡大',
+      '高齢者等の社会参加促進',
+      '見守り機能による安心・安全',
+      '地域コミュニティの活性化',
+      '行政サービスの利用率向上',
+    ],
+    'セキュリティ': [
+      'サイバー攻撃からの防御力強化',
+      '情報漏洩リスクの低減',
+      '業務継続性の確保',
+      '住民データの保護',
+      '行政への信頼性向上',
+    ],
+    '知識共有': [
+      '政策立案の質向上',
+      '試行錯誤コストの削減',
+      '横展開のスピードアップ',
+      '職員のスキルアップ',
+      '組織学習の促進',
+    ],
+    '業務効率化': [
+      '処理時間の短縮',
+      'ペーパーレス化によるコスト削減',
+      'テレワーク環境の整備',
+      '意思決定の迅速化',
+      '職員の働きやすさ向上',
+    ],
+  };
+  
+  const resourcesTemplates = [
+    '専門人材（PM、エンジニア、データサイエンティスト等）',
+    'システム開発・運用費用',
+    'クラウドインフラ利用料',
+    '職員向け研修・教育費用',
+    '外部コンサルティング費用',
+    '関係機関との調整コスト',
+    'セキュリティ監査・認証費用',
+    'ユーザーサポート体制',
+  ];
+  
+  const risksTemplates = [
+    '技術的な実現性の不確実性',
+    '関係機関との調整の長期化',
+    '既存システムとの連携の複雑さ',
+    '利用者の習熟・定着に時間を要する可能性',
+    'セキュリティインシデントのリスク',
+    '予算確保の不確実性',
+    '法制度・ガイドラインの整備状況',
+    '運用体制の持続可能性',
+  ];
+  
+  const stepsTemplates = [
+    '企画立案・関係者ヒアリング（1-2ヶ月）',
+    '要件定義・仕様策定（2-3ヶ月）',
+    'プロトタイプ開発・PoC実施（3-6ヶ月）',
+    '本格開発・テスト（6-12ヶ月）',
+    'パイロット運用・改善（3-6ヶ月）',
+    '全国展開・横展開（12ヶ月〜）',
+    '運用・保守・継続的改善',
+  ];
+  
+  const policiesTemplates: Record<string, string[]> = {
+    'AI・自動化': [
+      'AI戦略2024',
+      'デジタル社会の実現に向けた重点計画',
+      '行政手続のオンライン化推進',
+    ],
+    '市民サービス': [
+      'デジタル・ガバメント実行計画',
+      '自治体DX推進計画',
+      'マイナンバー制度の利活用推進',
+    ],
+    'データ活用': [
+      'EBPM推進方針',
+      'オープンデータ基本指針',
+      'データ戦略',
+    ],
+    '防災・危機管理': [
+      '国土強靱化基本計画',
+      '防災基本計画',
+      '災害対策基本法',
+    ],
+    'デジタルデバイド対策': [
+      'デジタル活用支援推進事業',
+      '高齢社会対策大綱',
+      '障害者基本計画',
+    ],
+    'セキュリティ': [
+      'サイバーセキュリティ戦略',
+      '政府機関等のセキュリティ対策基準',
+      'ゼロトラストアーキテクチャ適用方針',
+    ],
+    '知識共有': [
+      '地方公共団体情報システムの標準化',
+      '自治体間連携推進',
+      'デジタル人材育成方針',
+    ],
+    '業務効率化': [
+      '働き方改革実行計画',
+      '電子決裁推進',
+      'ペーパーレス化推進',
+    ],
+  };
+  
+  const category = idea.category;
+  const background = backgroundTemplates[category] || backgroundTemplates['業務効率化'];
+  const benefits = benefitsTemplates[category] || benefitsTemplates['業務効率化'];
+  const policies = policiesTemplates[category] || policiesTemplates['業務効率化'];
+  
+  // Select items based on scores
+  const shuffleAndTake = <T,>(arr: T[], n: number): T[] => {
+    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, n);
+  };
+  
+  const numBenefits = idea.impact >= 75 ? 4 : 3;
+  const numResources = idea.feasibility < 70 ? 5 : 4;
+  const numRisks = idea.feasibility < 65 ? 4 : 3;
+  const numSteps = 5;
+  
+  return {
+    background,
+    expectedBenefits: shuffleAndTake(benefits, numBenefits),
+    requiredResources: shuffleAndTake(resourcesTemplates, numResources),
+    risks: shuffleAndTake(risksTemplates, numRisks),
+    implementationSteps: stepsTemplates.slice(0, numSteps),
+    relatedPolicies: shuffleAndTake(policies, 2),
+  };
 }
