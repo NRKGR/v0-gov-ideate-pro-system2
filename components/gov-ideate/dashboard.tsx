@@ -19,6 +19,9 @@ import {
   mockScoredIdeas,
   mockBMCData,
   mockAuditReport,
+  mockPoolAuditReport,
+  mockIdeaAuditReports,
+  mockBMCAuditReport,
 } from '@/lib/mock-data';
 
 export function Dashboard() {
@@ -50,9 +53,13 @@ export function Dashboard() {
     setCurrentPhase(phase);
   }, []);
   
-  const handleIdeaSelect = useCallback((idea: ScoredIdea) => {
-    setSelectedIdea(idea);
-  }, []);
+  const handleIdeaSelect = useCallback((idea: ScoredIdea | null) => {
+    if (idea && selectedIdea?.id === idea.id) {
+      setSelectedIdea(null); // Toggle off if clicking same idea
+    } else {
+      setSelectedIdea(idea);
+    }
+  }, [selectedIdea]);
   
   const getMinistryName = () => {
     const ministry = ministries.find((m) => m.id === selectedMinistry);
@@ -75,6 +82,8 @@ export function Dashboard() {
         return (
           <IdeatePhase
             ideas={mockScoredIdeas.slice(0, 5)}
+            selectedIdea={selectedIdea}
+            onIdeaSelect={handleIdeaSelect}
             onComplete={() => handlePhaseComplete('ideate', 'filter')}
           />
         );
@@ -144,6 +153,11 @@ export function Dashboard() {
           <AuditPanel
             report={isProcessing ? null : mockAuditReport}
             isProcessing={isProcessing}
+            currentPhase={currentPhase}
+            selectedIdea={selectedIdea}
+            poolAudit={mockPoolAuditReport}
+            ideaAudit={selectedIdea ? mockIdeaAuditReports[selectedIdea.id] : null}
+            bmcAudit={mockBMCAuditReport}
           />
         </aside>
       )}

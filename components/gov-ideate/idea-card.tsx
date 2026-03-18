@@ -9,7 +9,7 @@ import type { ScoredIdea } from '@/lib/mock-data';
 interface IdeaCardProps {
   idea: ScoredIdea;
   isSelected?: boolean;
-  onSelect?: (idea: ScoredIdea) => void;
+  onSelect?: (idea: ScoredIdea | null) => void;
   variant?: 'compact' | 'full';
   className?: string;
 }
