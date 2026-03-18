@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Sparkles, ArrowRight, CheckCircle2, Download, Shuffle } from 'lucide-react';
+import { Sparkles, ArrowRight, CheckCircle2, Download, Shuffle, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -47,10 +47,12 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
   
   const handleFindSimilar = useCallback((targetIdea: ScoredIdea) => {
     if (allIdeas.length === 0) return;
-    const similarIdeas = findSimilarIdeas(targetIdea, allIdeas, 5);
-    setSampleIdeas(similarIdeas);
-    // Clear selection when finding similar
-    onIdeaSelect?.(null);
+    // Get 4 similar ideas (excluding target)
+    const similarIdeas = findSimilarIdeas(targetIdea, allIdeas, 4);
+    // Keep target idea as first, add 4 similar ideas after
+    setSampleIdeas([targetIdea, ...similarIdeas]);
+    // Keep the target idea selected
+    onIdeaSelect?.(targetIdea);
   }, [allIdeas, onIdeaSelect]);
   
   const handleExportCSV = useCallback(() => {
@@ -159,15 +161,33 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                   </Button>
                 </div>
                 <div className="grid gap-4">
-                  {sampleIdeas.map((idea) => (
-                    <IdeaCard 
-                      key={idea.id} 
-                      idea={idea} 
-                      variant="full"
-                      isSelected={selectedIdea?.id === idea.id}
-                      onSelect={onIdeaSelect}
-                      onFindSimilar={handleFindSimilar}
-                    />
+                  {sampleIdeas.map((idea, index) => (
+                    <div key={idea.id} className="space-y-2">
+                      <IdeaCard 
+                        idea={idea} 
+                        variant="full"
+                        isSelected={selectedIdea?.id === idea.id}
+                        onSelect={onIdeaSelect}
+                      />
+                      {/* Show "類似案を探す" button only for selected idea */}
+                      {selectedIdea?.id === idea.id && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleFindSimilar(idea)}
+                          className="w-full gap-2 border-primary/30 text-primary hover:bg-primary/10"
+                        >
+                          <Search className="h-4 w-4" />
+                          この案の類似案を探す
+                        </Button>
+                      )}
+                      {/* Show indicator for similar ideas (not the first one which is the target) */}
+                      {index > 0 && sampleIdeas[0]?.id === selectedIdea?.id && (
+                        <p className="text-xs text-muted-foreground text-center">
+                          類似案
+                        </p>
+                      )}
+                    </div>
                   ))}
                 </div>
               </div>

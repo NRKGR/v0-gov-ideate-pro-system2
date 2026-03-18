@@ -3,14 +3,13 @@
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Zap, Sparkles, ChevronRight, Search } from 'lucide-react';
+import { TrendingUp, Zap, Sparkles, ChevronRight } from 'lucide-react';
 import type { ScoredIdea } from '@/lib/mock-data';
 
 interface IdeaCardProps {
   idea: ScoredIdea;
   isSelected?: boolean;
   onSelect?: (idea: ScoredIdea | null) => void;
-  onFindSimilar?: (idea: ScoredIdea) => void;
   variant?: 'compact' | 'full';
   className?: string;
 }
@@ -19,7 +18,6 @@ export function IdeaCard({
   idea,
   isSelected,
   onSelect,
-  onFindSimilar,
   variant = 'full',
   className,
 }: IdeaCardProps) {
@@ -133,33 +131,17 @@ export function IdeaCard({
           </div>
         )}
         
-        {(onSelect || onFindSimilar) && (
-          <div className="pt-2 flex gap-2">
-            {onFindSimilar && (
-              <Button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onFindSimilar(idea);
-                }}
-                variant="outline"
-                size="sm"
-                className="flex-1 gap-1"
-              >
-                <Search className="h-4 w-4" />
-                類似案を探す
-              </Button>
-            )}
-            {onSelect && (
-              <Button
-                onClick={() => onSelect(idea)}
-                variant={isSelected ? 'default' : 'outline'}
-                size="sm"
-                className="flex-1"
-              >
-                {isSelected ? '選択中' : 'この案を選択'}
-                <ChevronRight className="h-4 w-4 ml-1" />
-              </Button>
-            )}
+        {onSelect && (
+          <div className="pt-2">
+            <Button
+              onClick={() => onSelect(idea)}
+              variant={isSelected ? 'default' : 'outline'}
+              size="sm"
+              className="w-full"
+            >
+              {isSelected ? '選択中' : 'この案を選択'}
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Button>
           </div>
         )}
       </div>
