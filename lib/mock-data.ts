@@ -62,11 +62,31 @@ export interface IdeaDetails {
   relatedPolicies: string[];
 }
 
+// 評価根拠の型定義
+export interface EvaluationCriterion {
+  name: string;
+  score: number;
+  maxScore: number;
+  rationale: string;
+}
+
+export interface EvaluationBreakdown {
+  feasibility: {
+    total: number;
+    criteria: EvaluationCriterion[];
+  };
+  impact: {
+    total: number;
+    criteria: EvaluationCriterion[];
+  };
+}
+
 export interface ScoredIdea extends Idea {
   totalScore: number;
   quadrant: 'quick-win' | 'moonshot' | 'core' | 'low-priority';
   reasoning: string;
   details?: IdeaDetails;
+  evaluationBreakdown?: EvaluationBreakdown;
 }
 
 export interface BMCData {
@@ -409,7 +429,7 @@ export const mockPoolAuditReport: PoolAuditReport = {
   goodPoints: [
     '技術・サービス・データ活用の3軸でバランスよく生成',
     '既存政策との整合性を保ちつつ新規性のある提案',
-    'ユーザー視点（住民・職員）の両面からアプローチ',
+    'ユーザ���視点（住民・職員）の両面からアプローチ',
     'スケーラビリティを意識した提案が多い',
   ],
   gaps: [
@@ -716,6 +736,106 @@ const ideaTitles: Record<string, string[]> = {
   ],
 };
 
+// 評価根拠を生成するヘルパー関数
+function generateEvaluationBreakdown(
+  category: string,
+  feasibilityTotal: number,
+  impactTotal: number
+): EvaluationBreakdown {
+  // 実現可能性の評価軸テンプレート
+  const feasibilityTemplates: Record<string, { name: string; rationales: { high: string; low: string } }[]> = {
+    'AI・自動化': [
+      { name: '技術成熟度', rationales: { high: 'LLM・機械学習技術は商用レベルで成熟', low: '最先端技術のため実証段階' } },
+      { name: '既存システム連携', rationales: { high: 'API連携で既存基盤と統合可能', low: 'レガシーシステムとの連携に課題' } },
+      { name: '予算規模', rationales: { high: 'SaaS利用で初期投資を抑制可能', low: '大規模な初期投資が必要' } },
+      { name: '法制度整備', rationales: { high: 'AI利活用ガイドライン整備済み', low: '個人情報保護・AI規制の整理が必要' } },
+    ],
+    '市民サービス': [
+      { name: '技術成熟度', rationales: { high: 'Webサービス技術は十分成熟', low: '新規技術の導入が必要' } },
+      { name: '既存システム連携', rationales: { high: '既存ポータルとの連携が容易', low: '複数システムの統合が必要' } },
+      { name: '予算規模', rationales: { high: '既存予算枠内で対応可能', low: '新規予算確保が必要' } },
+      { name: '法制度整備', rationales: { high: '関連法規は整備済み', low: '条例改正等が必要' } },
+    ],
+    'データ活用': [
+      { name: '技術成熟度', rationales: { high: 'BI・分析ツールは成熟', low: '高度な分析基盤の構築が必要' } },
+      { name: '既存システム連携', rationales: { high: 'データ連携基盤が整備済み', low: 'データサイロの解消が必要' } },
+      { name: '予算規模', rationales: { high: 'クラウドサービス活用で効率化', low: 'データ基盤整備に大規模投資' } },
+      { name: '法制度整備', rationales: { high: 'オープンデータ指針に準拠', low: 'データガバナンス整備が必要' } },
+    ],
+    'default': [
+      { name: '技術成熟度', rationales: { high: '既存技術の組み合わせで実現', low: '技術検証が必要' } },
+      { name: '既存システム連携', rationales: { high: '既存基盤との連携が容易', low: 'システム改修が必要' } },
+      { name: '予算規模', rationales: { high: '既存予算で対応可能', low: '追加予算確保が必要' } },
+      { name: '法制度整備', rationales: { high: '法的障壁なし', low: '法制度の整理が必要' } },
+    ],
+  };
+
+  // 影響度の評価軸テンプレート
+  const impactTemplates: Record<string, { name: string; rationales: { high: string; low: string } }[]> = {
+    'AI・自動化': [
+      { name: '対象人数', rationales: { high: '全職員・全住民が対象', low: '特定部署のみが対象' } },
+      { name: '業務効率化効果', rationales: { high: '業務時間50%以上削減見込み', low: '効率化効果は限定的' } },
+      { name: '政策優先度', rationales: { high: 'デジタル庁重点施策と合致', low: '政策優先度は中程度' } },
+      { name: '波及効果', rationales: { high: '他自治体・省庁への横展開可能', low: '横展開は困難' } },
+    ],
+    '市民サービス': [
+      { name: '対象人数', rationales: { high: '全住民がサービス対象', low: '特定層のみが対象' } },
+      { name: '業務効率化効果', rationales: { high: '窓口業務を大幅削減', low: '業務改善効果は軽微' } },
+      { name: '政策優先度', rationales: { high: '住民サービス向上の最重要施策', low: '優先度は相対的に低い' } },
+      { name: '波及効果', rationales: { high: '住民満足度向上に直結', low: '波及効果は限定的' } },
+    ],
+    'データ活用': [
+      { name: '対象人数', rationales: { high: '政策立案者全体に影響', low: '特定分野のみに影響' } },
+      { name: '業務効率化効果', rationales: { high: '意思決定の質を大幅向上', low: '改善効果は限定的' } },
+      { name: '政策優先度', rationales: { high: 'EBPM推進の中核施策', low: '優先度は中程度' } },
+      { name: '波及効果', rationales: { high: '全省庁の政策立案に貢献', low: '波及範囲は限定的' } },
+    ],
+    'default': [
+      { name: '対象人数', rationales: { high: '広範な対象に影響', low: '対象は限定的' } },
+      { name: '業務効率化効果', rationales: { high: '大幅な効率化が期待', low: '効果は限定的' } },
+      { name: '政策優先度', rationales: { high: '政策方針と強く合致', low: '優先度は中程度' } },
+      { name: '波及効果', rationales: { high: '幅広い波及効果', low: '波及効果は限定的' } },
+    ],
+  };
+
+  const feasibilityAxes = feasibilityTemplates[category] || feasibilityTemplates['default'];
+  const impactAxes = impactTemplates[category] || impactTemplates['default'];
+
+  // 各軸のスコアを生成（合計がtotalに近くなるように調整）
+  const generateCriteria = (
+    axes: { name: string; rationales: { high: string; low: string } }[],
+    total: number
+  ): EvaluationCriterion[] => {
+    const maxPerAxis = 25;
+    const targetAvg = total / 4;
+    
+    return axes.map((axis) => {
+      // totalに応じてスコアを分散
+      const variance = Math.floor(Math.random() * 10) - 5;
+      const score = Math.max(5, Math.min(maxPerAxis, Math.round(targetAvg / 4 + variance)));
+      const isHigh = score >= 15;
+      
+      return {
+        name: axis.name,
+        score,
+        maxScore: maxPerAxis,
+        rationale: isHigh ? axis.rationales.high : axis.rationales.low,
+      };
+    });
+  };
+
+  return {
+    feasibility: {
+      total: feasibilityTotal,
+      criteria: generateCriteria(feasibilityAxes, feasibilityTotal),
+    },
+    impact: {
+      total: impactTotal,
+      criteria: generateCriteria(impactAxes, impactTotal),
+    },
+  };
+}
+
 export function generate300Ideas(): ScoredIdea[] {
   const ideas: ScoredIdea[] = [];
   let id = 1;
@@ -765,6 +885,13 @@ export function generate300Ideas(): ScoredIdea[] {
       const novelty = Math.floor(Math.random() * 40) + 40; // 40-80
       const totalScore = Math.round((feasibility + impact + novelty) / 3);
       
+      // 評価根拠を生成
+      const evaluationBreakdown = generateEvaluationBreakdown(
+        template.category,
+        feasibility,
+        impact
+      );
+      
       ideas.push({
         id: String(id),
         title,
@@ -777,6 +904,7 @@ export function generate300Ideas(): ScoredIdea[] {
         totalScore,
         quadrant,
         reasoning: `${template.category}分野における${baseTitle}の導入により、業務効率化と住民サービス向上が期待できる。`,
+        evaluationBreakdown,
       });
       id++;
     }
