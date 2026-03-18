@@ -734,21 +734,36 @@ export function generate300Ideas(): ScoredIdea[] {
       const baseTitle = titles[titleIndex];
       const title = variant > 1 ? `${baseTitle} v${variant}` : baseTitle;
       
-      const feasibility = Math.floor(Math.random() * 40) + 50; // 50-90
-      const impact = Math.floor(Math.random() * 40) + 50; // 50-90
-      const novelty = Math.floor(Math.random() * 40) + 40; // 40-80
-      const totalScore = Math.round((feasibility + impact + novelty) / 3);
-      
+      // Distribute across all 4 quadrants evenly
+      const quadrantSeed = Math.random();
+      let feasibility: number;
+      let impact: number;
       let quadrant: ScoredIdea['quadrant'];
-      if (feasibility >= 70 && impact >= 75) {
+      
+      if (quadrantSeed < 0.25) {
+        // Quick Win: high feasibility (>=70), high impact (>=75)
+        feasibility = Math.floor(Math.random() * 25) + 70; // 70-95
+        impact = Math.floor(Math.random() * 20) + 78; // 78-98
         quadrant = 'quick-win';
-      } else if (feasibility < 70 && impact >= 75) {
+      } else if (quadrantSeed < 0.5) {
+        // Moonshot: low feasibility (<70), high impact (>=75)
+        feasibility = Math.floor(Math.random() * 25) + 40; // 40-65
+        impact = Math.floor(Math.random() * 20) + 78; // 78-98
         quadrant = 'moonshot';
-      } else if (feasibility >= 70 && impact < 75) {
+      } else if (quadrantSeed < 0.75) {
+        // Sustainable Core: high feasibility (>=70), low impact (<75)
+        feasibility = Math.floor(Math.random() * 25) + 70; // 70-95
+        impact = Math.floor(Math.random() * 25) + 50; // 50-74
         quadrant = 'core';
       } else {
+        // Low Priority: low feasibility (<70), low impact (<75)
+        feasibility = Math.floor(Math.random() * 25) + 40; // 40-65
+        impact = Math.floor(Math.random() * 25) + 45; // 45-70
         quadrant = 'low-priority';
       }
+      
+      const novelty = Math.floor(Math.random() * 40) + 40; // 40-80
+      const totalScore = Math.round((feasibility + impact + novelty) / 3);
       
       ideas.push({
         id: String(id),
