@@ -213,7 +213,7 @@ export const mockIdeas: Idea[] = [
     feasibility: 88,
     impact: 65,
     novelty: 55,
-    tags: ['予約システム', 'データ活用', '利便性���上'],
+    tags: ['予約システム', 'データ活用', '利便性����上'],
   },
   {
     id: '5',
@@ -517,7 +517,7 @@ export const mockIdeaAuditReports: Record<string, IdeaAuditReport> = {
       'サポート人員の確保・育成',
     ],
     recommendations: [
-      '地域のデジタル支援員との連携',
+      '地���のデジタル支援員との連携',
       '段階的な機能追加アプローチ',
     ],
   },
@@ -850,4 +850,51 @@ export function generateIdeaAuditReport(idea: ScoredIdea): IdeaAuditReport {
     risks: shuffleAndTake(risksTemplates, numRisks),
     recommendations: shuffleAndTake(recommendationsTemplates, numRecommendations),
   };
+}
+
+// Find similar ideas based on category and score proximity
+export function findSimilarIdeas(
+  targetIdea: ScoredIdea,
+  allIdeas: ScoredIdea[],
+  count: number = 5
+): ScoredIdea[] {
+  // Calculate similarity score for each idea
+  const scoredIdeas = allIdeas
+    .filter((idea) => idea.id !== targetIdea.id)
+    .map((idea) => {
+      let similarity = 0;
+      
+      // Same category = high similarity
+      if (idea.category === targetIdea.category) {
+        similarity += 50;
+      }
+      
+      // Score proximity (closer scores = more similar)
+      const scoreDiff = Math.abs(idea.totalScore - targetIdea.totalScore);
+      similarity += Math.max(0, 30 - scoreDiff);
+      
+      // Same quadrant = moderate similarity
+      if (idea.quadrant === targetIdea.quadrant) {
+        similarity += 20;
+      }
+      
+      // Feasibility proximity
+      const feasibilityDiff = Math.abs(idea.feasibility - targetIdea.feasibility);
+      similarity += Math.max(0, 15 - feasibilityDiff / 2);
+      
+      // Impact proximity
+      const impactDiff = Math.abs(idea.impact - targetIdea.impact);
+      similarity += Math.max(0, 15 - impactDiff / 2);
+      
+      // Tag overlap
+      const commonTags = idea.tags.filter((tag) => targetIdea.tags.includes(tag)).length;
+      similarity += commonTags * 10;
+      
+      return { idea, similarity };
+    })
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, count)
+    .map(({ idea }) => idea);
+  
+  return scoredIdeas;
 }

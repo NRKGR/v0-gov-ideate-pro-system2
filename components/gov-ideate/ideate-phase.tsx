@@ -9,7 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { AgentCard } from './agent-card';
 import { IdeaCard } from './idea-card';
 import { IdeasListModal } from './ideas-list-modal';
-import { generate300Ideas, exportIdeasToCSV, downloadCSV, type ScoredIdea } from '@/lib/mock-data';
+import { generate300Ideas, exportIdeasToCSV, downloadCSV, findSimilarIdeas, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeatePhaseProps {
   ideas: ScoredIdea[];
@@ -42,6 +42,14 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
     const shuffled = [...allIdeas].sort(() => Math.random() - 0.5);
     setSampleIdeas(shuffled.slice(0, 5));
     // Clear selection when shuffling
+    onIdeaSelect?.(null);
+  }, [allIdeas, onIdeaSelect]);
+  
+  const handleFindSimilar = useCallback((targetIdea: ScoredIdea) => {
+    if (allIdeas.length === 0) return;
+    const similarIdeas = findSimilarIdeas(targetIdea, allIdeas, 5);
+    setSampleIdeas(similarIdeas);
+    // Clear selection when finding similar
     onIdeaSelect?.(null);
   }, [allIdeas, onIdeaSelect]);
   
@@ -158,6 +166,7 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                       variant="full"
                       isSelected={selectedIdea?.id === idea.id}
                       onSelect={onIdeaSelect}
+                      onFindSimilar={handleFindSimilar}
                     />
                   ))}
                 </div>
