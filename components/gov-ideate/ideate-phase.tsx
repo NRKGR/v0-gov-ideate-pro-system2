@@ -166,17 +166,7 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                 </div>
               </div>
             )}
-                      {/* Show indicator for similar ideas (not the first one which is the target) */}
-                      {index > 0 && sampleIdeas[0]?.id === selectedIdea?.id && (
-                        <p className="text-xs text-muted-foreground text-center">
-                          類似案
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+                      
             
             {/* Next Phase Button */}
             <div className="flex justify-end pt-4">
