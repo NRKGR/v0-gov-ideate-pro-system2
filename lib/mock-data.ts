@@ -213,7 +213,7 @@ export const mockIdeas: Idea[] = [
     feasibility: 88,
     impact: 65,
     novelty: 55,
-    tags: ['予約システム', 'データ活用', '利便性向上'],
+    tags: ['予約システム', 'データ活用', '利便性��上'],
   },
   {
     id: '5',
@@ -404,7 +404,7 @@ export const mockPoolAuditReport: PoolAuditReport = {
   ],
   gaps: [
     '国際連携・海外展開の観点が弱い',
-    '民間企業との協業モデルの深掘りが不足',
+    '民間企業との協業モデルの深掘���が不足',
     '長期的な社会変化への対応案が少ない',
   ],
   recommendations: [
@@ -650,3 +650,145 @@ export const phaseInfo = {
   filter: { name: '選別', description: 'マトリクス評価・絞り込み' },
   design: { name: '設計', description: 'BMC・実行計画策定' },
 };
+
+// Generate 300 mock ideas for CSV export
+const ideaTemplates = [
+  { category: 'AI・自動化', prefix: 'AI' },
+  { category: '市民サービス', prefix: 'CS' },
+  { category: 'データ活用', prefix: 'DA' },
+  { category: '防災・危機管理', prefix: 'DM' },
+  { category: 'デジタルデバイド対策', prefix: 'DD' },
+  { category: 'セキュリティ', prefix: 'SC' },
+  { category: '知識共有', prefix: 'KS' },
+  { category: '業務効率化', prefix: 'EF' },
+];
+
+const ideaTitles: Record<string, string[]> = {
+  'AI・自動化': [
+    'AI窓口アシスタント', '文書自動要約システム', 'AIチャットボット相談窓口', '自動翻訳支援ツール',
+    'AI議事録作成システム', '予測分析ダッシュボード', 'RPA業務自動化基盤', 'AIコールセンター支援',
+    '自動FAQ生成システム', 'AI申請書類チェック', '音声認識窓口システム', 'AIスケジュール最適化',
+  ],
+  '市民サービス': [
+    'オンライン申請ポータル', 'マイページ統合サービス', '予約統合プラットフォーム', 'プッシュ通知サービス',
+    '行政サービス検索エンジン', 'ワンストップ窓口', '電子申請ナビゲーター', 'サービス満足度可視化',
+    'コンシェルジュサービス', 'ライフイベント支援', '多言語対応ポータル', '手続き進捗トラッカー',
+  ],
+  'データ活用': [
+    '政策効果ダッシュボード', 'オープンデータ基盤', 'データカタログシステム', 'BI分析ツール',
+    '人流データ活用基盤', 'EBPMデータプラットフォーム', 'リアルタイム統計システム', 'GIS分析基盤',
+    '省庁間データ連携', 'データマーケットプレイス', '統計API基盤', 'データ品質管理システム',
+  ],
+  '防災・危機管理': [
+    'デジタル防災プラットフォーム', '避難所管理システム', '災害情報集約基盤', 'リアルタイム警報システム',
+    '防災訓練シミュレーター', '物資配分最適化', '安否確認システム', '復旧支援ダッシュボード',
+    'ドローン災害監視', 'SNS情報収集システム', '被災者支援マッチング', 'インフラ監視基盤',
+  ],
+  'デジタルデバイド対策': [
+    'シニア向けデジタル支援', 'アクセシビリティ診断', '音声操作インターフェース', 'やさしい日本語変換',
+    'デジタル支援員マッチング', '高齢者見守りシステム', '簡易操作端末', 'リモート支援サービス',
+    'デジタル活用研修', '多世代交流プラットフォーム', '視覚障害者支援ツール', 'タッチレス操作端末',
+  ],
+  'セキュリティ': [
+    'ゼロトラスト基盤', 'サイバー脅威検知', '統合認証基盤', 'セキュリティ監査ツール',
+    '脆弱性管理システム', 'インシデント対応基盤', '暗号化通信基盤', 'アクセス制御システム',
+    'セキュリティ教育プラットフォーム', 'ペネトレーションテスト自動化', 'ログ分析基盤', 'SOCダッシュボード',
+  ],
+  '知識共有': [
+    '自治体ナレッジベース', 'ベストプラクティス共有', '政策事例データベース', 'FAQ共有プラットフォーム',
+    '職員向けWiki', 'メンタリングマッチング', '研修コンテンツ共有', 'コミュニティフォーラム',
+    '失敗事例データベース', 'ノウハウ可視化ツール', 'Q&Aボット', '専門家ネットワーク',
+  ],
+  '業務効率化': [
+    '電子決裁システム', 'ワークフロー自動化', 'タスク管理ダッシュボード', '会議室予約最適化',
+    '勤怠管理システム', 'プロジェクト管理ツール', '経費精算自動化', '人事評価支援システム',
+    '文書管理システム', 'ナレッジ検索エンジン', 'コミュニケーション基盤', '業務可視化ツール',
+  ],
+};
+
+export function generate300Ideas(): ScoredIdea[] {
+  const ideas: ScoredIdea[] = [];
+  let id = 1;
+  
+  // Generate ideas for each category
+  for (const template of ideaTemplates) {
+    const titles = ideaTitles[template.category] || [];
+    const count = template.category === 'AI・自動化' ? 78 :
+                  template.category === '市民サービス' ? 65 :
+                  template.category === 'データ活用' ? 52 : 
+                  Math.floor((300 - 78 - 65 - 52) / 5);
+    
+    for (let i = 0; i < count; i++) {
+      const titleIndex = i % titles.length;
+      const variant = Math.floor(i / titles.length) + 1;
+      const baseTitle = titles[titleIndex];
+      const title = variant > 1 ? `${baseTitle} v${variant}` : baseTitle;
+      
+      const feasibility = Math.floor(Math.random() * 40) + 50; // 50-90
+      const impact = Math.floor(Math.random() * 40) + 50; // 50-90
+      const novelty = Math.floor(Math.random() * 40) + 40; // 40-80
+      const totalScore = Math.round((feasibility + impact + novelty) / 3);
+      
+      let quadrant: ScoredIdea['quadrant'];
+      if (feasibility >= 70 && impact >= 75) {
+        quadrant = 'quick-win';
+      } else if (feasibility < 70 && impact >= 75) {
+        quadrant = 'moonshot';
+      } else if (feasibility >= 70 && impact < 75) {
+        quadrant = 'core';
+      } else {
+        quadrant = 'low-priority';
+      }
+      
+      ideas.push({
+        id: String(id),
+        title,
+        description: `${template.category}カテゴリの施策案。${baseTitle}を活用した行政サービスの改善・効率化を目指す。`,
+        category: template.category,
+        feasibility,
+        impact,
+        novelty,
+        tags: [template.prefix, template.category.slice(0, 4)],
+        totalScore,
+        quadrant,
+        reasoning: `${template.category}分野における${baseTitle}の導入により、業務効率化と住民サービス向上が期待できる。`,
+      });
+      id++;
+    }
+  }
+  
+  return ideas;
+}
+
+export function exportIdeasToCSV(ideas: ScoredIdea[]): string {
+  const headers = ['ID', 'タイトル', '説明', 'カテゴリ', '実現可能性', 'インパクト', '独自性', '総合スコア', '象限', 'タグ', '評価理由'];
+  
+  const rows = ideas.map(idea => [
+    idea.id,
+    `"${idea.title.replace(/"/g, '""')}"`,
+    `"${idea.description.replace(/"/g, '""')}"`,
+    idea.category,
+    idea.feasibility,
+    idea.impact,
+    idea.novelty,
+    idea.totalScore,
+    idea.quadrant,
+    `"${idea.tags.join(', ')}"`,
+    `"${idea.reasoning.replace(/"/g, '""')}"`,
+  ]);
+  
+  return [headers.join(','), ...rows.map(row => row.join(','))].join('\n');
+}
+
+export function downloadCSV(content: string, filename: string): void {
+  const BOM = '\uFEFF'; // UTF-8 BOM for Excel compatibility
+  const blob = new Blob([BOM + content], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  URL.revokeObjectURL(url);
+}
