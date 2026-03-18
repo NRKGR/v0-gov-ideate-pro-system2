@@ -20,8 +20,8 @@ import {
   mockBMCData,
   mockAuditReport,
   mockPoolAuditReport,
-  mockIdeaAuditReports,
   mockBMCAuditReport,
+  generateIdeaAuditReport,
 } from '@/lib/mock-data';
 
 export function Dashboard() {
@@ -156,7 +156,7 @@ export function Dashboard() {
             currentPhase={currentPhase}
             selectedIdea={selectedIdea}
             poolAudit={mockPoolAuditReport}
-            ideaAudit={selectedIdea ? mockIdeaAuditReports[selectedIdea.id] : null}
+            ideaAudit={selectedIdea ? generateIdeaAuditReport(selectedIdea) : null}
             bmcAudit={mockBMCAuditReport}
           />
         </aside>
