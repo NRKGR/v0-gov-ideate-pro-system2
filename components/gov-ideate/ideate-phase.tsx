@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Sparkles, ArrowRight, CheckCircle2, Download } from 'lucide-react';
+import { Sparkles, ArrowRight, CheckCircle2, Download, Shuffle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,13 +24,26 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
   const [isGenerating, setIsGenerating] = useState(true);
   const [showIdeas, setShowIdeas] = useState(false);
   const [allIdeas, setAllIdeas] = useState<ScoredIdea[]>([]);
+  const [sampleIdeas, setSampleIdeas] = useState<ScoredIdea[]>(ideas);
   
   // Generate all 300 ideas once when generation completes
   useEffect(() => {
     if (!isGenerating && allIdeas.length === 0) {
-      setAllIdeas(generate300Ideas());
+      const generated = generate300Ideas();
+      setAllIdeas(generated);
+      // Set initial sample from generated ideas
+      setSampleIdeas(generated.slice(0, 5));
     }
   }, [isGenerating, allIdeas.length]);
+  
+  const handleShuffle = useCallback(() => {
+    if (allIdeas.length === 0) return;
+    // Fisher-Yates shuffle to get 5 random ideas
+    const shuffled = [...allIdeas].sort(() => Math.random() - 0.5);
+    setSampleIdeas(shuffled.slice(0, 5));
+    // Clear selection when shuffling
+    onIdeaSelect?.(null);
+  }, [allIdeas, onIdeaSelect]);
   
   const handleExportCSV = useCallback(() => {
     const ideasToExport = allIdeas.length > 0 ? allIdeas : generate300Ideas();
@@ -122,12 +135,23 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
             {/* Sample Ideas */}
             {showIdeas && (
               <div className="space-y-3 fade-in-up">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <h4 className="font-semibold text-foreground">サンプルアイデア（5案）</h4>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <h4 className="font-semibold text-foreground">サンプルアイデア（5案）</h4>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleShuffle}
+                    className="gap-2"
+                  >
+                    <Shuffle className="h-4 w-4" />
+                    シャッフル
+                  </Button>
                 </div>
                 <div className="grid gap-4">
-                  {ideas.map((idea) => (
+                  {sampleIdeas.map((idea) => (
                     <IdeaCard 
                       key={idea.id} 
                       idea={idea} 
