@@ -43,10 +43,10 @@ export function FilterPhase({
     .slice(0, 20);
   
   const quadrantLabels: Record<string, string> = {
-    'quick-win': 'Quick Win',
-    'moonshot': 'Moonshot',
-    'core': 'Sustainable Core',
-    'low-priority': 'Low Priority',
+    'quick-win': '優先実施',
+    'moonshot': '戦略検討',
+    'core': '継続改善',
+    'low-priority': '見送り検討',
   };
   
   return (

@@ -51,10 +51,10 @@ const categories = [
 ];
 
 const quadrantLabels: Record<string, { label: string; color: string }> = {
-  'quick-win': { label: 'Quick Win', color: 'bg-score-high/20 text-score-high' },
-  'moonshot': { label: 'Moonshot', color: 'bg-primary/20 text-primary' },
-  'core': { label: 'Core', color: 'bg-score-medium/20 text-score-medium' },
-  'low-priority': { label: 'Low Priority', color: 'bg-muted text-muted-foreground' },
+  'quick-win': { label: '優先実施', color: 'bg-score-high/20 text-score-high' },
+  'moonshot': { label: '戦略検討', color: 'bg-primary/20 text-primary' },
+  'core': { label: '継続改善', color: 'bg-score-medium/20 text-score-medium' },
+  'low-priority': { label: '見送り検討', color: 'bg-muted text-muted-foreground' },
 };
 
 type SortField = 'totalScore' | 'feasibility' | 'impact' | 'novelty';
