@@ -25,14 +25,12 @@ export function Dashboard() {
   const [currentPhase, setCurrentPhase] = useState<PhaseType>('input');
   const [completedPhases, setCompletedPhases] = useState<PhaseType[]>([]);
   const [selectedMinistry, setSelectedMinistry] = useState('');
-  const [focusArea, setFocusArea] = useState('');
   const [selectedIdea, setSelectedIdea] = useState<ScoredIdea | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [showAudit, setShowAudit] = useState(false);
   
-  const handleInputSubmit = useCallback(async (ministry: string, focus: string) => {
+  const handleInputSubmit = useCallback(async (ministry: string) => {
     setSelectedMinistry(ministry);
-    setFocusArea(focus);
     setCompletedPhases(['input']);
     setCurrentPhase('research');
     setIsProcessing(true);
@@ -124,8 +122,6 @@ export function Dashboard() {
               <div className="flex items-center gap-2 text-sm">
                 <span className="text-muted-foreground">対象:</span>
                 <span className="font-medium text-foreground">{getMinistryName()}</span>
-                <span className="text-muted-foreground">/</span>
-                <span className="font-medium text-foreground">{focusArea}</span>
               </div>
             )}
           </div>
