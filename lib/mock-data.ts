@@ -171,7 +171,7 @@ export const mockResearchOutput: ResearchOutput = {
     ],
   },
   budgetInfo: {
-    totalBudget: '約5,000億円（令和6年度）',
+    totalBudget: '約5,000億円',
     relatedPrograms: [
       { name: 'ガバメントクラウド整備', amount: '約800億円' },
       { name: '地方公共団体情報システム標準化', amount: '約1,200億円' },
@@ -460,7 +460,7 @@ export const mockIdeaAuditReports: Record<string, IdeaAuditReport> = {
     ],
     risks: [
       'AI回答の正確性担保が課題',
-      '個人情報の取り扱いに注意が必要',
+      '個人情���の取り扱いに注意が必要',
     ],
     recommendations: [
       '段階的な導入計画の策定',
@@ -791,7 +791,7 @@ function generateEvaluationBreakdown(
       { name: '波及効果', rationales: { high: '全省庁の政策立案に貢献', low: '波及範囲は限定���' } },
     ],
 'default': [
-      { name: '対象人数', rationales: { high: '広範な対象に影響', low: '対象は限定的' } },
+      { name: '対象人数', rationales: { high: '広範な対��に影響', low: '対象は限定的' } },
       { name: '業務効率化効果', rationales: { high: '大幅な効率化が期待', low: '効果は限定的' } },
       { name: '政策優先度', rationales: { high: '政策方針と強く合致', low: '優先度は中程度' } },
       { name: '波及効果', rationales: { high: '幅広い波及効果', low: '波及効果は限定的' } },
