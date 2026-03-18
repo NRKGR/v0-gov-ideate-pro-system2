@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Building2, Target, Sparkles, ArrowRight } from 'lucide-react';
+import { Building2, Sparkles, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -16,26 +15,25 @@ import {
 import { ministries } from '@/lib/mock-data';
 
 interface InputFormProps {
-  onSubmit: (ministry: string, focusArea: string) => void;
+  onSubmit: (ministry: string) => void;
   className?: string;
 }
 
 export function InputForm({ onSubmit, className }: InputFormProps) {
   const [selectedMinistry, setSelectedMinistry] = useState('');
-  const [focusArea, setFocusArea] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedMinistry || !focusArea) return;
+    if (!selectedMinistry) return;
     
     setIsSubmitting(true);
     // Simulate a small delay for UX
     await new Promise((resolve) => setTimeout(resolve, 500));
-    onSubmit(selectedMinistry, focusArea);
+    onSubmit(selectedMinistry);
   };
   
-  const isValid = selectedMinistry && focusArea.trim().length > 0;
+  const isValid = !!selectedMinistry;
   
   return (
     <div className={cn('flex flex-col items-center justify-center min-h-[60vh]', className)}>
@@ -49,7 +47,7 @@ export function InputForm({ onSubmit, className }: InputFormProps) {
             新規事業アイデア創出
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
-            対象となる省庁と注力分野を選択してください。
+            対象となる省庁を選択してください。
             5つのAIエージェントが協働して事業アイデアを創出します。
           </p>
         </div>
@@ -79,24 +77,6 @@ export function InputForm({ onSubmit, className }: InputFormProps) {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-          
-          {/* Focus Area */}
-          <div className="space-y-2">
-            <Label htmlFor="focusArea" className="flex items-center gap-2 text-foreground">
-              <Target className="h-4 w-4 text-primary" />
-              注力分野
-            </Label>
-            <Input
-              id="focusArea"
-              value={focusArea}
-              onChange={(e) => setFocusArea(e.target.value)}
-              placeholder="例: 行政DX、子育て支援、脱炭素..."
-              className="h-12 bg-background/50"
-            />
-            <p className="text-xs text-muted-foreground">
-              分析対象となる政策分野やテーマを入力してください
-            </p>
           </div>
           
           {/* Submit Button */}
