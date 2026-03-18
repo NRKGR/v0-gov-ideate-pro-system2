@@ -112,7 +112,7 @@ export function PayoffMatrix({
           <ScatterChart margin={{ top: 20, right: 20, bottom: 40, left: 40 }}>
             <CartesianGrid
               strokeDasharray="3 3"
-              stroke="hsl(var(--border))"
+              stroke="#d1d5db"
               opacity={0.5}
             />
             <XAxis
@@ -120,15 +120,16 @@ export function PayoffMatrix({
               dataKey="x"
               name="実現可能性"
               domain={[0, 100]}
+              ticks={[0, 25, 50, 75, 100]}
               tickLine={false}
-              axisLine={{ stroke: 'hsl(var(--border))' }}
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+              axisLine={{ stroke: '#9ca3af' }}
+              tick={{ fill: '#9ca3af', fontSize: 12 }}
               label={{
                 value: '実現可能性 →',
-                position: 'bottom',
-                fill: 'hsl(var(--foreground))',
+                position: 'insideBottom',
+                fill: '#6b7280',
                 fontSize: 12,
-                offset: 20,
+                offset: -10,
               }}
             />
             <YAxis
@@ -136,26 +137,28 @@ export function PayoffMatrix({
               dataKey="y"
               name="社会的インパクト"
               domain={[0, 100]}
+              ticks={[0, 25, 50, 75, 100]}
               tickLine={false}
-              axisLine={{ stroke: 'hsl(var(--border))' }}
-              tick={{ fill: 'hsl(var(--muted-foreground))', fontSize: 12 }}
+              axisLine={{ stroke: '#9ca3af' }}
+              tick={{ fill: '#9ca3af', fontSize: 12 }}
               label={{
                 value: '社会的インパクト →',
                 angle: -90,
-                position: 'left',
-                fill: 'hsl(var(--foreground))',
+                position: 'insideLeft',
+                fill: '#6b7280',
                 fontSize: 12,
                 offset: 10,
+                style: { textAnchor: 'middle' },
               }}
             />
             <ReferenceLine
               x={70}
-              stroke="hsl(var(--border))"
+              stroke="#9ca3af"
               strokeDasharray="5 5"
             />
             <ReferenceLine
               y={75}
-              stroke="hsl(var(--border))"
+              stroke="#9ca3af"
               strokeDasharray="5 5"
             />
             <Tooltip content={<CustomTooltip />} />
@@ -171,7 +174,7 @@ export function PayoffMatrix({
                 <Cell
                   key={`cell-${index}`}
                   fill={getQuadrantColor(entry.quadrant, selectedIdea?.id === entry.id)}
-                  stroke={selectedIdea?.id === entry.id ? 'hsl(var(--foreground))' : 'transparent'}
+                  stroke={selectedIdea?.id === entry.id ? '#1f2937' : 'transparent'}
                   strokeWidth={selectedIdea?.id === entry.id ? 2 : 0}
                   r={selectedIdea?.id === entry.id ? 10 : 8}
                 />
