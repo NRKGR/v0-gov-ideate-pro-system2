@@ -788,9 +788,9 @@ function generateEvaluationBreakdown(
       { name: '対象人数', rationales: { high: '政策立案者全体に影響', low: '特定分野のみに影響' } },
       { name: '業務効率化効果', rationales: { high: '意思決定の質を大幅向上', low: '改善効果は限定的' } },
       { name: '政策優先度', rationales: { high: 'EBPM推進の中核施策', low: '優先度は中程度' } },
-      { name: '波及効果', rationales: { high: '全省庁の政策立案に貢献', low: '波及範囲は限定的' } },
+      { name: '波及効果', rationales: { high: '全省庁の政策立案に貢献', low: '波及範囲は限定���' } },
     ],
-    'default': [
+'default': [
       { name: '対象人数', rationales: { high: '広範な対象に影響', low: '対象は限定的' } },
       { name: '業務効率化効果', rationales: { high: '大幅な効率化が期待', low: '効果は限定的' } },
       { name: '政策優先度', rationales: { high: '政策方針と強く合致', low: '優先度は中程度' } },
@@ -1102,7 +1102,7 @@ export function generateIdeaDetails(idea: ScoredIdea): IdeaDetails {
     'デジタルデバイド対策': [
       'デジタルサービスへのアクセス拡大',
       '高齢者等の社会参加促進',
-      '見守り機能による安心・安全',
+      '見守り��能による安心・安全',
       '地域コミュニティの活性化',
       '行政サービスの利用率向上',
     ],
@@ -1114,7 +1114,7 @@ export function generateIdeaDetails(idea: ScoredIdea): IdeaDetails {
       '行政への信頼性向上',
     ],
     '知識共有': [
-      '政策立案の質向上',
+      '���策立案の質向上',
       '試行錯誤コストの削減',
       '横展開のスピードアップ',
       '職員のスキルアップ',
@@ -1179,7 +1179,7 @@ export function generateIdeaDetails(idea: ScoredIdea): IdeaDetails {
     ],
     '防災・危機管理': [
       '国土強靱化基本計画',
-      '防災基本計画',
+      '防災��本計画',
       '災害対策基本法',
     ],
     'デジタルデバイド対策': [

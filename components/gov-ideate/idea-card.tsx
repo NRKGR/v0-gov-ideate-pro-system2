@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Zap, Sparkles, ChevronRight, ChevronDown, ChevronUp, Target, AlertTriangle, Footprints, FileText, Lightbulb, BarChart3 } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import { generateIdeaDetails, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeaCardProps {
@@ -191,7 +190,12 @@ export function IdeaCard({
                           </span>
                           <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
                         </div>
-                        <Progress value={(criterion.score / criterion.maxScore) * 100} className="h-1.5" />
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-score-medium rounded-full transition-all"
+                            style={{ width: `${(criterion.score / criterion.maxScore) * 100}%` }}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -214,7 +218,12 @@ export function IdeaCard({
                           </span>
                           <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
                         </div>
-                        <Progress value={(criterion.score / criterion.maxScore) * 100} className="h-1.5" />
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-score-high rounded-full transition-all"
+                            style={{ width: `${(criterion.score / criterion.maxScore) * 100}%` }}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
