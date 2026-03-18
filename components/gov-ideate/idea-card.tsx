@@ -38,10 +38,10 @@ export function IdeaCard({
   };
   
   const quadrantLabels = {
-    'quick-win': 'Quick Win',
-    'moonshot': 'Strategic Moonshot',
-    'core': 'Sustainable Core',
-    'low-priority': 'Low Priority',
+    'quick-win': '優先実施',
+    'moonshot': '戦略検討',
+    'core': '継続改善',
+    'low-priority': '見送り検討',
   };
   
   const quadrantLabelColors = {
