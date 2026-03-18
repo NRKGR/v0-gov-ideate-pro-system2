@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Sparkles, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Sparkles, ArrowRight, CheckCircle2, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { AgentCard } from './agent-card';
 import { IdeaCard } from './idea-card';
-import type { ScoredIdea } from '@/lib/mock-data';
+import { generate300Ideas, exportIdeasToCSV, downloadCSV, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeatePhaseProps {
   ideas: ScoredIdea[];
@@ -22,6 +22,13 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
   const [generationProgress, setGenerationProgress] = useState(0);
   const [isGenerating, setIsGenerating] = useState(true);
   const [showIdeas, setShowIdeas] = useState(false);
+  
+  const handleExportCSV = useCallback(() => {
+    const allIdeas = generate300Ideas();
+    const csv = exportIdeasToCSV(allIdeas);
+    const timestamp = new Date().toISOString().slice(0, 10);
+    downloadCSV(csv, `gov-ideate-300ideas-${timestamp}.csv`);
+  }, []);
   
   useEffect(() => {
     if (isGenerating) {
@@ -67,9 +74,20 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                     </p>
                   </div>
                 </div>
-                <Badge className="bg-score-high/20 text-score-high text-lg px-3 py-1">
-                  300案
-                </Badge>
+                <div className="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    onClick={handleExportCSV}
+                    className="gap-2"
+                  >
+                    <Download className="h-4 w-4" />
+                    CSV出力
+                  </Button>
+                  <Badge className="bg-score-high/20 text-score-high text-lg px-3 py-1">
+                    300案
+                  </Badge>
+                </div>
               </div>
               
               <div className="grid grid-cols-4 gap-3">
