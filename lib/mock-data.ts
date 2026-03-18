@@ -734,31 +734,31 @@ export function generate300Ideas(): ScoredIdea[] {
       const baseTitle = titles[titleIndex];
       const title = variant > 1 ? `${baseTitle} v${variant}` : baseTitle;
       
-      // Distribute across all 4 quadrants evenly
+      // Distribute across all 4 quadrants evenly (threshold at 50/50)
       const quadrantSeed = Math.random();
       let feasibility: number;
       let impact: number;
       let quadrant: ScoredIdea['quadrant'];
       
       if (quadrantSeed < 0.25) {
-        // Quick Win: high feasibility (>=70), high impact (>=75)
-        feasibility = Math.floor(Math.random() * 25) + 70; // 70-95
-        impact = Math.floor(Math.random() * 20) + 78; // 78-98
+        // Quick Win: high feasibility (>=50), high impact (>=50)
+        feasibility = Math.floor(Math.random() * 45) + 52; // 52-97
+        impact = Math.floor(Math.random() * 45) + 52; // 52-97
         quadrant = 'quick-win';
       } else if (quadrantSeed < 0.5) {
-        // Moonshot: low feasibility (<70), high impact (>=75)
-        feasibility = Math.floor(Math.random() * 25) + 40; // 40-65
-        impact = Math.floor(Math.random() * 20) + 78; // 78-98
+        // Moonshot: low feasibility (<50), high impact (>=50)
+        feasibility = Math.floor(Math.random() * 45) + 5; // 5-50
+        impact = Math.floor(Math.random() * 45) + 52; // 52-97
         quadrant = 'moonshot';
       } else if (quadrantSeed < 0.75) {
-        // Sustainable Core: high feasibility (>=70), low impact (<75)
-        feasibility = Math.floor(Math.random() * 25) + 70; // 70-95
-        impact = Math.floor(Math.random() * 25) + 50; // 50-74
+        // Sustainable Core: high feasibility (>=50), low impact (<50)
+        feasibility = Math.floor(Math.random() * 45) + 52; // 52-97
+        impact = Math.floor(Math.random() * 45) + 5; // 5-50
         quadrant = 'core';
       } else {
-        // Low Priority: low feasibility (<70), low impact (<75)
-        feasibility = Math.floor(Math.random() * 25) + 40; // 40-65
-        impact = Math.floor(Math.random() * 25) + 45; // 45-70
+        // Low Priority: low feasibility (<50), low impact (<50)
+        feasibility = Math.floor(Math.random() * 45) + 5; // 5-50
+        impact = Math.floor(Math.random() * 45) + 5; // 5-50
         quadrant = 'low-priority';
       }
       
@@ -832,7 +832,7 @@ export function generateIdeaAuditReport(idea: ScoredIdea): IdeaAuditReport {
     `${idea.category}分野の重要課題に対応`,
     '既存技術の活用で実現性が高い',
     '住民サービス向上への直接的効果',
-    '横展開が容易な設計',
+    '横���開が容易な設計',
     'コスト効率が良い',
     '政策優先度との整合性が高い',
     'ステークホルダーの理解を得やすい',
@@ -843,7 +843,7 @@ export function generateIdeaAuditReport(idea: ScoredIdea): IdeaAuditReport {
     '既存システムとの連携に課題',
     '運用体制の整備が必要',
     '予算確保の見通しが不透明',
-    'セキュリティ要件の精査が必要',
+    'セキュリティ要���の精査が必要',
   ];
   
   const recommendationsTemplates = [
@@ -1016,7 +1016,7 @@ export function generateIdeaDetails(idea: ScoredIdea): IdeaDetails {
     '技術的な実現性の不確実性',
     '関係機関との調整の長期化',
     '既存システムとの連携の複雑さ',
-    '利用者の習熟・定着に時間を要する可能性',
+    '利用者���習熟・定着に時間を要する可能性',
     'セキュリティインシデントのリスク',
     '予算確保の不確実性',
     '法制度・ガイドラインの整備状況',

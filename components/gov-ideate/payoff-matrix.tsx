@@ -152,12 +152,12 @@ export function PayoffMatrix({
               }}
             />
             <ReferenceLine
-              x={70}
+              x={50}
               stroke="#9ca3af"
               strokeDasharray="5 5"
             />
             <ReferenceLine
-              y={75}
+              y={50}
               stroke="#9ca3af"
               strokeDasharray="5 5"
             />
