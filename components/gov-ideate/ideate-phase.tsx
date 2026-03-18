@@ -12,11 +12,13 @@ import type { ScoredIdea } from '@/lib/mock-data';
 
 interface IdeatePhaseProps {
   ideas: ScoredIdea[];
+  selectedIdea?: ScoredIdea | null;
+  onIdeaSelect?: (idea: ScoredIdea | null) => void;
   onComplete: () => void;
   className?: string;
 }
 
-export function IdeatePhase({ ideas, onComplete, className }: IdeatePhaseProps) {
+export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, className }: IdeatePhaseProps) {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [isGenerating, setIsGenerating] = useState(true);
   const [showIdeas, setShowIdeas] = useState(false);
@@ -94,7 +96,13 @@ export function IdeatePhase({ ideas, onComplete, className }: IdeatePhaseProps) 
                 </div>
                 <div className="grid gap-4">
                   {ideas.map((idea) => (
-                    <IdeaCard key={idea.id} idea={idea} variant="full" />
+                    <IdeaCard 
+                      key={idea.id} 
+                      idea={idea} 
+                      variant="full"
+                      isSelected={selectedIdea?.id === idea.id}
+                      onSelect={onIdeaSelect}
+                    />
                   ))}
                 </div>
               </div>

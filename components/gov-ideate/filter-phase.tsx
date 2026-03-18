@@ -12,7 +12,7 @@ import type { ScoredIdea } from '@/lib/mock-data';
 interface FilterPhaseProps {
   ideas: ScoredIdea[];
   selectedIdea: ScoredIdea | null;
-  onIdeaSelect: (idea: ScoredIdea) => void;
+  onIdeaSelect: (idea: ScoredIdea | null) => void;
   onComplete: () => void;
   className?: string;
 }

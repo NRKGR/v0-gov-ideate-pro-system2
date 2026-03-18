@@ -84,6 +84,41 @@ export interface AuditReport {
   }[];
 }
 
+// Phase-specific audit types
+export type AuditMode = 'research' | 'ideate-pool' | 'ideate-idea' | 'filter' | 'design';
+
+export interface IdeaAuditReport {
+  ideaId: string;
+  overallScore: number;
+  feasibilityScore: number;
+  impactScore: number;
+  noveltyScore: number;
+  policyAlignmentScore: number;
+  goodPoints: string[];
+  risks: string[];
+  recommendations: string[];
+}
+
+export interface PoolAuditReport {
+  overallScore: number;
+  diversityScore: number;
+  creativityScore: number;
+  coverageScore: number;
+  goodPoints: string[];
+  gaps: string[];
+  recommendations: string[];
+}
+
+export interface BMCAuditReport {
+  overallScore: number;
+  completenessScore: number;
+  consistencyScore: number;
+  viabilityScore: number;
+  goodPoints: string[];
+  weaknesses: string[];
+  recommendations: string[];
+}
+
 // Demo data for デジタル庁 + 行政DX
 export const mockResearchOutput: ResearchOutput = {
   ministry: 'デジタル庁',
@@ -352,6 +387,226 @@ export const mockAuditReport: AuditReport = {
     { category: '新規性', score: 68, comment: '類似サービスは存在するが、行政特化は差別化要因' },
     { category: '持続可能性', score: 80, comment: 'SaaSモデルによる継続的な収益確保が可能' },
     { category: '政策整合性', score: 85, comment: 'デジタル庁の方針と高い整合性' },
+  ],
+};
+
+// Pool audit (for ideate phase when no idea is selected)
+export const mockPoolAuditReport: PoolAuditReport = {
+  overallScore: 82,
+  diversityScore: 85,
+  creativityScore: 78,
+  coverageScore: 83,
+  goodPoints: [
+    '技術・サービス・データ活用の3軸でバランスよく生成',
+    '既存政策との整合性を保ちつつ新規性のある提案',
+    'ユーザー視点（住民・職員）の両面からアプローチ',
+    'スケーラビリティを意識した提案が多い',
+  ],
+  gaps: [
+    '国際連携・海外展開の観点が弱い',
+    '民間企業との協業モデルの深掘りが不足',
+    '長期的な社会変化への対応案が少ない',
+  ],
+  recommendations: [
+    '海外先進事例の参照を追加',
+    '官民連携スキームの具体化',
+    '10年後の社会像を起点としたバックキャスト案の追加',
+  ],
+};
+
+// Individual idea audit reports (keyed by idea ID)
+export const mockIdeaAuditReports: Record<string, IdeaAuditReport> = {
+  '1': {
+    ideaId: '1',
+    overallScore: 78,
+    feasibilityScore: 75,
+    impactScore: 82,
+    noveltyScore: 68,
+    policyAlignmentScore: 85,
+    goodPoints: [
+      '既存AI技術の活用で実現性が高い',
+      '住民サービス向上への直接的効果',
+      '多言語対応で外国人住民にも配慮',
+    ],
+    risks: [
+      'AI回答の正確性担保が課題',
+      '個人情報の取り扱いに注意が必要',
+    ],
+    recommendations: [
+      '段階的な導入計画の策定',
+      '人間によるエスカレーション体制の整備',
+    ],
+  },
+  '2': {
+    ideaId: '2',
+    overallScore: 77,
+    feasibilityScore: 80,
+    impactScore: 78,
+    noveltyScore: 72,
+    policyAlignmentScore: 78,
+    goodPoints: [
+      'LLM技術の成熟により実現可能性が向上',
+      '全省庁共通の課題解決に寄与',
+      '横展開が容易な設計',
+    ],
+    risks: [
+      '機密文書の取り扱いルール整備が必要',
+      '既存の文書管理システムとの連携',
+    ],
+    recommendations: [
+      'パイロット省庁での先行実施',
+      'セキュリティ要件の明確化',
+    ],
+  },
+  '3': {
+    ideaId: '3',
+    overallScore: 80,
+    feasibilityScore: 70,
+    impactScore: 95,
+    noveltyScore: 75,
+    policyAlignmentScore: 80,
+    goodPoints: [
+      '社会的インパクトが非常に高い',
+      '防災は国民の関心が高い分野',
+      'リアルタイム情報共有で命を救える',
+    ],
+    risks: [
+      '複数機関との調整が必要',
+      '災害時のシステム可用性確保',
+    ],
+    recommendations: [
+      '関係機関との協議体制の構築',
+      '冗長性を持ったインフラ設計',
+    ],
+  },
+  '4': {
+    ideaId: '4',
+    overallScore: 69,
+    feasibilityScore: 88,
+    impactScore: 65,
+    noveltyScore: 55,
+    policyAlignmentScore: 68,
+    goodPoints: [
+      '技術的難易度が低く即座に着手可能',
+      '利用者の利便性向上が確実',
+      '既存技術の組み合わせで実現',
+    ],
+    risks: [
+      '既存システムとの統合コスト',
+      '利用率向上のための周知が必要',
+    ],
+    recommendations: [
+      '既存システムの棚卸しを先行',
+      '利用者向けインセンティブの検討',
+    ],
+  },
+  '5': {
+    ideaId: '5',
+    overallScore: 72,
+    feasibilityScore: 72,
+    impactScore: 80,
+    noveltyScore: 65,
+    policyAlignmentScore: 78,
+    goodPoints: [
+      'デジタルデバイド解消の政策優先度に合致',
+      '見守り機能で付加価値を創出',
+      '人的サポートとの組み合わせが効果的',
+    ],
+    risks: [
+      '高齢者の端末操作習熟に時間が必要',
+      'サポート人員の確保・育成',
+    ],
+    recommendations: [
+      '地域のデジタル支援員との連携',
+      '段階的な機能追加アプローチ',
+    ],
+  },
+  '6': {
+    ideaId: '6',
+    overallScore: 78,
+    feasibilityScore: 68,
+    impactScore: 88,
+    noveltyScore: 78,
+    policyAlignmentScore: 90,
+    goodPoints: [
+      'EBPM推進の中核施策となりうる',
+      '政策効果の可視化で説明責任を果たせる',
+      'データ連携基盤の活用促進',
+    ],
+    risks: [
+      'データ連携の整備状況に依存',
+      'KPI設定の妥当性確保が課題',
+    ],
+    recommendations: [
+      'データ整備と並行した段階的構築',
+      '専門家によるKPIレビュー体制',
+    ],
+  },
+  '7': {
+    ideaId: '7',
+    overallScore: 72,
+    feasibilityScore: 85,
+    impactScore: 72,
+    noveltyScore: 60,
+    policyAlignmentScore: 75,
+    goodPoints: [
+      '自治体間連携は政策的にも推奨',
+      '成功・失敗事例の共有で効率化',
+      '横展開のスピードアップに寄与',
+    ],
+    risks: [
+      'プラットフォーム運営の持続性',
+      '情報の質の担保が課題',
+    ],
+    recommendations: [
+      '運営主体の明確化',
+      '情報の評価・キュレーション体制',
+    ],
+  },
+  '8': {
+    ideaId: '8',
+    overallScore: 72,
+    feasibilityScore: 55,
+    impactScore: 92,
+    noveltyScore: 70,
+    policyAlignmentScore: 82,
+    goodPoints: [
+      'セキュリティ強化は喫緊の課題',
+      'リモートワーク環境の整備促進',
+      'サイバー攻撃への耐性強化',
+    ],
+    risks: [
+      '全省庁統一には大規模な予算が必要',
+      '既存システムからの移行が困難',
+    ],
+    recommendations: [
+      '段階的な導入計画の策定',
+      'パイロット省庁での実証実験',
+    ],
+  },
+};
+
+// BMC audit report
+export const mockBMCAuditReport: BMCAuditReport = {
+  overallScore: 81,
+  completenessScore: 85,
+  consistencyScore: 78,
+  viabilityScore: 80,
+  goodPoints: [
+    '9つの構成要素がバランスよく記述されている',
+    '価値提案と顧客セグメントの整合性が高い',
+    '収益モデルが具体的で実現可能',
+    'パートナーシップ戦略が明確',
+  ],
+  weaknesses: [
+    'コスト構造の詳細な見積もりが不足',
+    'チャネル間の連携戦略が不明確',
+    '競合との差別化ポイントの深掘りが必要',
+  ],
+  recommendations: [
+    'コストシミュレーションの実施',
+    'オムニチャネル戦略の策定',
+    '競合分析の追加と差別化要因の明確化',
   ],
 };
 
