@@ -1,10 +1,11 @@
 'use client';
 
+import { useState, useMemo } from 'react';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Zap, Sparkles, ChevronRight } from 'lucide-react';
-import type { ScoredIdea } from '@/lib/mock-data';
+import { TrendingUp, Zap, Sparkles, ChevronRight, ChevronDown, ChevronUp, Target, AlertTriangle, Footprints, FileText, Lightbulb } from 'lucide-react';
+import { generateIdeaDetails, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeaCardProps {
   idea: ScoredIdea;
@@ -21,6 +22,14 @@ export function IdeaCard({
   variant = 'full',
   className,
 }: IdeaCardProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+  
+  // Generate details only when expanded (memoized)
+  const details = useMemo(() => {
+    if (!isExpanded) return null;
+    return generateIdeaDetails(idea);
+  }, [isExpanded, idea]);
+  
   const quadrantColors = {
     'quick-win': 'border-l-score-high bg-score-high/5',
     'moonshot': 'border-l-primary bg-primary/5',
@@ -128,6 +137,123 @@ export function IdeaCard({
             <p className="text-sm text-muted-foreground italic">
               {`"${idea.reasoning}"`}
             </p>
+          </div>
+        )}
+        
+        {/* Expand/Collapse Button */}
+        <div className="pt-2">
+          <Button
+            onClick={() => setIsExpanded(!isExpanded)}
+            variant="ghost"
+            size="sm"
+            className="w-full text-muted-foreground hover:text-foreground"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="h-4 w-4 mr-1" />
+                詳細を閉じる
+              </>
+            ) : (
+              <>
+                <ChevronDown className="h-4 w-4 mr-1" />
+                詳細を見る
+              </>
+            )}
+          </Button>
+        </div>
+        
+        {/* Expanded Details */}
+        {isExpanded && details && (
+          <div className="pt-4 space-y-4 border-t border-border/50 animate-in slide-in-from-top-2 duration-200">
+            {/* Background */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <FileText className="h-4 w-4 text-primary" />
+                背景・現状
+              </div>
+              <p className="text-sm text-muted-foreground pl-6">
+                {details.background}
+              </p>
+            </div>
+            
+            {/* Expected Benefits */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Target className="h-4 w-4 text-score-high" />
+                期待される効果
+              </div>
+              <ul className="text-sm text-muted-foreground pl-6 space-y-1">
+                {details.expectedBenefits.map((benefit, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="text-score-high mt-1">•</span>
+                    {benefit}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Required Resources */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Lightbulb className="h-4 w-4 text-score-medium" />
+                必要リソース
+              </div>
+              <ul className="text-sm text-muted-foreground pl-6 space-y-1">
+                {details.requiredResources.map((resource, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="text-score-medium mt-1">•</span>
+                    {resource}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Risks */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <AlertTriangle className="h-4 w-4 text-score-low" />
+                想定リスク
+              </div>
+              <ul className="text-sm text-muted-foreground pl-6 space-y-1">
+                {details.risks.map((risk, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="text-score-low mt-1">•</span>
+                    {risk}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            
+            {/* Implementation Steps */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <Footprints className="h-4 w-4 text-primary" />
+                実現までのステップ
+              </div>
+              <ol className="text-sm text-muted-foreground pl-6 space-y-1">
+                {details.implementationSteps.map((step, i) => (
+                  <li key={i} className="flex items-start gap-2">
+                    <span className="text-primary font-medium">{i + 1}.</span>
+                    {step}
+                  </li>
+                ))}
+              </ol>
+            </div>
+            
+            {/* Related Policies */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2 text-sm font-medium text-foreground">
+                <FileText className="h-4 w-4 text-muted-foreground" />
+                関連する既存施策
+              </div>
+              <div className="flex flex-wrap gap-2 pl-6">
+                {details.relatedPolicies.map((policy, i) => (
+                  <Badge key={i} variant="outline" className="text-xs">
+                    {policy}
+                  </Badge>
+                ))}
+              </div>
+            </div>
           </div>
         )}
         
