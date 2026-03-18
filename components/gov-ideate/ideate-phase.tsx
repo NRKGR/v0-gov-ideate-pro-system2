@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Sparkles, ArrowRight, CheckCircle2, Download, Shuffle, Search } from 'lucide-react';
+import { Sparkles, ArrowRight, CheckCircle2, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,7 +9,8 @@ import { Progress } from '@/components/ui/progress';
 import { AgentCard } from './agent-card';
 import { IdeaCard } from './idea-card';
 import { IdeasListModal } from './ideas-list-modal';
-import { generate300Ideas, exportIdeasToCSV, downloadCSV, findSimilarIdeas, type ScoredIdea } from '@/lib/mock-data';
+import { PayoffMatrix } from './payoff-matrix';
+import { generate300Ideas, exportIdeasToCSV, downloadCSV, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeatePhaseProps {
   ideas: ScoredIdea[];
@@ -24,36 +25,18 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
   const [isGenerating, setIsGenerating] = useState(true);
   const [showIdeas, setShowIdeas] = useState(false);
   const [allIdeas, setAllIdeas] = useState<ScoredIdea[]>([]);
-  const [sampleIdeas, setSampleIdeas] = useState<ScoredIdea[]>(ideas);
+  const [top20Ideas, setTop20Ideas] = useState<ScoredIdea[]>([]);
   
   // Generate all 300 ideas once when generation completes
   useEffect(() => {
     if (!isGenerating && allIdeas.length === 0) {
       const generated = generate300Ideas();
       setAllIdeas(generated);
-      // Set initial sample from generated ideas
-      setSampleIdeas(generated.slice(0, 5));
+      // Sort by totalScore descending and get top 20
+      const sorted = [...generated].sort((a, b) => b.totalScore - a.totalScore);
+      setTop20Ideas(sorted.slice(0, 20));
     }
   }, [isGenerating, allIdeas.length]);
-  
-  const handleShuffle = useCallback(() => {
-    if (allIdeas.length === 0) return;
-    // Fisher-Yates shuffle to get 5 random ideas
-    const shuffled = [...allIdeas].sort(() => Math.random() - 0.5);
-    setSampleIdeas(shuffled.slice(0, 5));
-    // Clear selection when shuffling
-    onIdeaSelect?.(null);
-  }, [allIdeas, onIdeaSelect]);
-  
-  const handleFindSimilar = useCallback((targetIdea: ScoredIdea) => {
-    if (allIdeas.length === 0) return;
-    // Get 4 similar ideas (excluding target)
-    const similarIdeas = findSimilarIdeas(targetIdea, allIdeas, 4);
-    // Keep target idea as first, add 4 similar ideas after
-    setSampleIdeas([targetIdea, ...similarIdeas]);
-    // Keep the target idea selected
-    onIdeaSelect?.(targetIdea);
-  }, [allIdeas, onIdeaSelect]);
   
   const handleExportCSV = useCallback(() => {
     const ideasToExport = allIdeas.length > 0 ? allIdeas : generate300Ideas();
@@ -142,45 +125,47 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
               </div>
             </div>
             
-            {/* Sample Ideas */}
+{/* Payoff Matrix - 300 ideas */}
+            {showIdeas && allIdeas.length > 0 && (
+              <div className="space-y-3 fade-in-up">
+                <h4 className="font-semibold text-foreground">ペイオフマトリクス（300案全体）</h4>
+                <PayoffMatrix
+                  ideas={allIdeas}
+                  selectedIdea={selectedIdea}
+                  onIdeaSelect={onIdeaSelect}
+                />
+              </div>
+            )}
+            
+            {/* Top 20 Ideas */}
             {showIdeas && (
               <div className="space-y-3 fade-in-up">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Sparkles className="h-4 w-4 text-primary" />
-                    <h4 className="font-semibold text-foreground">サンプルアイデア（5案）</h4>
-                  </div>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShuffle}
-                    className="gap-2"
-                  >
-                    <Shuffle className="h-4 w-4" />
-                    シャッフル
-                  </Button>
+                <div className="flex items-center gap-2">
+                  <Sparkles className="h-4 w-4 text-primary" />
+                  <h4 className="font-semibold text-foreground">上位20案</h4>
+                  <Badge variant="outline" className="ml-2">スコア順</Badge>
                 </div>
                 <div className="grid gap-4">
-                  {sampleIdeas.map((idea, index) => (
+                  {top20Ideas.map((idea, index) => (
                     <div key={idea.id} className="space-y-2">
-                      <IdeaCard 
-                        idea={idea} 
-                        variant="full"
-                        isSelected={selectedIdea?.id === idea.id}
-                        onSelect={onIdeaSelect}
-                      />
-                      {/* Show "類似案を探す" button only for selected idea */}
-                      {selectedIdea?.id === idea.id && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleFindSimilar(idea)}
-                          className="w-full gap-2 border-primary/30 text-primary hover:bg-primary/10"
-                        >
-                          <Search className="h-4 w-4" />
-                          この案の類似案を探す
-                        </Button>
-                      )}
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-medium text-muted-foreground w-6">
+                          {index + 1}.
+                        </span>
+                        <div className="flex-1">
+                          <IdeaCard 
+                            idea={idea} 
+                            variant="full"
+                            isSelected={selectedIdea?.id === idea.id}
+                            onSelect={onIdeaSelect}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
                       {/* Show indicator for similar ideas (not the first one which is the target) */}
                       {index > 0 && sampleIdeas[0]?.id === selectedIdea?.id && (
                         <p className="text-xs text-muted-foreground text-center">
