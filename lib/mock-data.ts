@@ -213,7 +213,7 @@ export const mockIdeas: Idea[] = [
     feasibility: 88,
     impact: 65,
     novelty: 55,
-    tags: ['予約システム', 'データ活用', '利便性��上'],
+    tags: ['予約システム', 'データ活用', '利便性���上'],
   },
   {
     id: '5',
@@ -404,7 +404,7 @@ export const mockPoolAuditReport: PoolAuditReport = {
   ],
   gaps: [
     '国際連携・海外展開の観点が弱い',
-    '民間企業との協業モデルの深掘���が不足',
+    '民間企業との協業モデルの深������が不足',
     '長期的な社会変化への対応案が少ない',
   ],
   recommendations: [
@@ -666,7 +666,7 @@ const ideaTemplates = [
 const ideaTitles: Record<string, string[]> = {
   'AI・自動化': [
     'AI窓口アシスタント', '文書自動要約システム', 'AIチャットボット相談窓口', '自動翻訳支援ツール',
-    'AI議事録作成システム', '予測分析ダッシュボード', 'RPA業務自動化基盤', 'AIコールセンター支援',
+    'AI議事録作成システム', '予測分析ダッシュボード', 'RPA��務自動化基盤', 'AIコールセンター支援',
     '自動FAQ生成システム', 'AI申請書類チェック', '音声認識窓口システム', 'AIスケジュール最適化',
   ],
   '市民サービス': [
@@ -791,4 +791,63 @@ export function downloadCSV(content: string, filename: string): void {
   link.click();
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
+}
+
+// Generate audit report dynamically based on idea properties
+export function generateIdeaAuditReport(idea: ScoredIdea): IdeaAuditReport {
+  // Check if we have a predefined report
+  if (mockIdeaAuditReports[idea.id]) {
+    return mockIdeaAuditReports[idea.id];
+  }
+  
+  // Generate dynamic report based on idea properties
+  const policyAlignmentScore = Math.floor(Math.random() * 20) + 70; // 70-90
+  
+  const goodPointsTemplates = [
+    `${idea.category}分野の重要課題に対応`,
+    '既存技術の活用で実現性が高い',
+    '住民サービス向上への直接的効果',
+    '横展開が容易な設計',
+    'コスト効率が良い',
+    '政策優先度との整合性が高い',
+    'ステークホルダーの理解を得やすい',
+  ];
+  
+  const risksTemplates = [
+    '関係機関との調整が必要',
+    '既存システムとの連携に課題',
+    '運用体制の整備が必要',
+    '予算確保の見通しが不透明',
+    'セキュリティ要件の精査が必要',
+  ];
+  
+  const recommendationsTemplates = [
+    '段階的な導入計画の策定',
+    'パイロット事業での実証を推奨',
+    'ステークホルダーとの早期協議',
+    'KPI設定と効果測定の仕組み構築',
+    'リスク軽減策の具体化',
+  ];
+  
+  // Select items based on scores
+  const numGoodPoints = idea.totalScore >= 70 ? 4 : idea.totalScore >= 60 ? 3 : 2;
+  const numRisks = idea.feasibility < 70 ? 3 : 2;
+  const numRecommendations = 3;
+  
+  const shuffleAndTake = <T,>(arr: T[], n: number): T[] => {
+    const shuffled = [...arr].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, n);
+  };
+  
+  return {
+    ideaId: idea.id,
+    overallScore: idea.totalScore,
+    feasibilityScore: idea.feasibility,
+    impactScore: idea.impact,
+    noveltyScore: idea.novelty,
+    policyAlignmentScore,
+    goodPoints: shuffleAndTake(goodPointsTemplates, numGoodPoints),
+    risks: shuffleAndTake(risksTemplates, numRisks),
+    recommendations: shuffleAndTake(recommendationsTemplates, numRecommendations),
+  };
 }
