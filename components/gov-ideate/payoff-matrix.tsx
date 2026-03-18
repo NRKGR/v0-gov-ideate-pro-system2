@@ -6,21 +6,14 @@ import {
   Scatter,
   XAxis,
   YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
   ReferenceLine,
   Cell,
-  ReferenceArea,
+  Label,
 } from 'recharts';
 import { cn } from '@/lib/utils';
-import { 
-  useChartTheme, 
-  quadrantColors, 
-  quadrantLabels, 
-  axisLabels,
-  getQuadrantColor,
-} from '@/lib/chart-theme';
+import { useChartTheme, getQuadrantColor } from '@/lib/chart-theme';
 import type { ScoredIdea } from '@/lib/mock-data';
 
 interface PayoffMatrixProps {
@@ -55,7 +48,12 @@ export function PayoffMatrix({
       const idea = ideas.find((i) => i.id === data.id);
       if (!idea) return null;
       
-      const label = quadrantLabels[idea.quadrant as keyof typeof quadrantLabels];
+      const quadrantNames: Record<string, string> = {
+        'quick-win': '優先実施',
+        'moonshot': '戦略検討',
+        'core': '継続改善',
+        'low-priority': '見送り検討',
+      };
       
       return (
         <div className="glass-card p-3 max-w-xs border border-border shadow-lg">
@@ -75,7 +73,7 @@ export function PayoffMatrix({
             </div>
             <div>
               <span className="text-muted-foreground">分類:</span>
-              <span className="ml-1 font-medium text-foreground">{label?.name}</span>
+              <span className="ml-1 font-medium text-foreground">{quadrantNames[idea.quadrant]}</span>
             </div>
           </div>
         </div>
@@ -83,64 +81,18 @@ export function PayoffMatrix({
     }
     return null;
   };
-
-  // Custom label component for quadrants
-  const QuadrantLabel = ({ x, y, label, color }: { x: number; y: number; label: { name: string; description: string }; color: string }) => (
-    <text
-      x={x}
-      y={y}
-      textAnchor="middle"
-      dominantBaseline="middle"
-      fontSize={11}
-      fontWeight={500}
-      fill={theme.mutedForeground}
-    >
-      <tspan x={x} dy="-0.5em" fill={color}>{label.name}</tspan>
-      {label.description && (
-        <tspan x={x} dy="1.2em" fontSize={10} fill={theme.mutedForeground}>（{label.description}）</tspan>
-      )}
-    </text>
-  );
   
   return (
-    <div className={cn('space-y-4', className)}>
-      {/* Chart */}
-      <div className="h-[450px] w-full">
+    <div className={cn('relative', className)}>
+      {/* Chart Container */}
+      <div className="h-[400px] w-full">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 30, right: 30, bottom: 50, left: 60 }}>
-            {/* Quadrant Background Areas */}
-            <ReferenceArea
-              x1={50} x2={100} y1={50} y2={100}
-              fill={theme.quadrantBg['quick-win']}
-              fillOpacity={1}
-            />
-            <ReferenceArea
-              x1={0} x2={50} y1={50} y2={100}
-              fill={theme.quadrantBg['moonshot']}
-              fillOpacity={1}
-            />
-            <ReferenceArea
-              x1={50} x2={100} y1={0} y2={50}
-              fill={theme.quadrantBg['core']}
-              fillOpacity={1}
-            />
-            <ReferenceArea
-              x1={0} x2={50} y1={0} y2={50}
-              fill={theme.quadrantBg['low-priority']}
-              fillOpacity={1}
-            />
-            
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke={theme.gridLine}
-              opacity={0.5}
-            />
+          <ScatterChart margin={{ top: 40, right: 40, bottom: 40, left: 50 }}>
             <XAxis
               type="number"
               dataKey="x"
-              name="実現可能性"
               domain={[0, 100]}
-              ticks={[0, 25, 50, 75, 100]}
+              ticks={[0, 50, 100]}
               tickLine={false}
               axisLine={{ stroke: theme.axisLine }}
               tick={{ fill: theme.mutedForeground, fontSize: 11 }}
@@ -148,25 +100,56 @@ export function PayoffMatrix({
             <YAxis
               type="number"
               dataKey="y"
-              name="影響度"
               domain={[0, 100]}
-              ticks={[0, 25, 50, 75, 100]}
+              ticks={[0, 50, 100]}
               tickLine={false}
               axisLine={{ stroke: theme.axisLine }}
               tick={{ fill: theme.mutedForeground, fontSize: 11 }}
             />
             
-            {/* Center Reference Lines */}
+            {/* Center Cross Lines */}
             <ReferenceLine
               x={50}
               stroke={theme.referenceLine}
-              strokeWidth={2}
-            />
+              strokeWidth={1.5}
+            >
+              <Label
+                value="優先実施"
+                position="insideTopRight"
+                offset={15}
+                fill={theme.foreground}
+                fontSize={12}
+                fontWeight={500}
+              />
+              <Label
+                value="戦略検討"
+                position="insideTopLeft"
+                offset={15}
+                fill={theme.foreground}
+                fontSize={12}
+                fontWeight={500}
+              />
+            </ReferenceLine>
             <ReferenceLine
               y={50}
               stroke={theme.referenceLine}
-              strokeWidth={2}
-            />
+              strokeWidth={1.5}
+            >
+              <Label
+                value="継続改善"
+                position="insideBottomRight"
+                offset={15}
+                fill={theme.mutedForeground}
+                fontSize={12}
+              />
+              <Label
+                value="見送り検討"
+                position="insideBottomLeft"
+                offset={15}
+                fill={theme.mutedForeground}
+                fontSize={12}
+              />
+            </ReferenceLine>
             
             <Tooltip content={<CustomTooltip />} />
             <Scatter
@@ -191,36 +174,23 @@ export function PayoffMatrix({
         </ResponsiveContainer>
       </div>
       
-      {/* Axis Labels */}
-      <div className="flex justify-between items-center px-12 text-xs">
-        <span className="text-muted-foreground">{axisLabels.x.low}</span>
+      {/* Axis Labels - Outside Chart */}
+      <div className="flex justify-between items-center px-12 -mt-2 text-xs text-muted-foreground">
+        <span>実現困難</span>
         <span className="font-medium text-foreground">実現可能性</span>
-        <span className="text-muted-foreground">{axisLabels.x.high}</span>
+        <span>実現容易</span>
       </div>
       
-      {/* Legend with Japanese labels */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs pt-2">
-        {(Object.entries(quadrantLabels) as [keyof typeof quadrantLabels, { name: string; description: string }][]).map(([key, label]) => (
-          <div key={key} className="flex items-center gap-2">
-            <div 
-              className="h-3 w-3 rounded-full flex-shrink-0" 
-              style={{ backgroundColor: quadrantColors[key] }}
-            />
-            <div>
-              <span className="font-medium text-foreground">{label.name}</span>
-              {label.description && (
-                <span className="text-muted-foreground ml-1">（{label.description}）</span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* Y-Axis Label (positioned on left side) */}
-      <div className="absolute left-0 top-1/2 -translate-y-1/2 -rotate-90 text-xs hidden">
-        <span className="text-muted-foreground">{axisLabels.y.low}</span>
-        <span className="mx-2 font-medium text-foreground">影響度</span>
-        <span className="text-muted-foreground">{axisLabels.y.high}</span>
+      {/* Y-Axis Label */}
+      <div 
+        className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-2"
+        style={{ writingMode: 'vertical-rl', textOrientation: 'mixed' }}
+      >
+        <div className="flex items-center gap-2 text-xs">
+          <span className="text-muted-foreground">影響大</span>
+          <span className="font-medium text-foreground">影響度</span>
+          <span className="text-muted-foreground">影響小</span>
+        </div>
       </div>
     </div>
   );
