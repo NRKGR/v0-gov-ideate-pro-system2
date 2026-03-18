@@ -186,11 +186,12 @@ export function IdeaCard({
                     {idea.evaluationBreakdown.feasibility.criteria.map((criterion, i) => (
                       <div key={i} className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground">{criterion.name}</span>
+                          <span className="text-muted-foreground">
+                            {criterion.name}（{criterion.rationale}）
+                          </span>
                           <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
                         </div>
                         <Progress value={(criterion.score / criterion.maxScore) * 100} className="h-1.5" />
-                        <p className="text-xs text-muted-foreground">{criterion.rationale}</p>
                       </div>
                     ))}
                   </div>
@@ -208,11 +209,12 @@ export function IdeaCard({
                     {idea.evaluationBreakdown.impact.criteria.map((criterion, i) => (
                       <div key={i} className="space-y-1">
                         <div className="flex items-center justify-between text-xs">
-                          <span className="text-muted-foreground">{criterion.name}</span>
+                          <span className="text-muted-foreground">
+                            {criterion.name}（{criterion.rationale}）
+                          </span>
                           <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
                         </div>
                         <Progress value={(criterion.score / criterion.maxScore) * 100} className="h-1.5" />
-                        <p className="text-xs text-muted-foreground">{criterion.rationale}</p>
                       </div>
                     ))}
                   </div>
