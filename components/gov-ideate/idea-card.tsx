@@ -5,7 +5,6 @@ import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Zap, Sparkles, ChevronRight, ChevronDown, ChevronUp, Target, AlertTriangle, Footprints, FileText, Lightbulb, BarChart3 } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import { generateIdeaDetails, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeaCardProps {
@@ -191,7 +190,12 @@ export function IdeaCard({
                           </span>
                           <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
                         </div>
-                        <Progress value={(criterion.score / criterion.maxScore) * 100} className="h-1.5" />
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-score-medium rounded-full transition-all"
+                            style={{ width: `${(criterion.score / criterion.maxScore) * 100}%` }}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>
@@ -214,7 +218,40 @@ export function IdeaCard({
                           </span>
                           <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
                         </div>
-                        <Progress value={(criterion.score / criterion.maxScore) * 100} className="h-1.5" />
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-score-high rounded-full transition-all"
+                            style={{ width: `${(criterion.score / criterion.maxScore) * 100}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                
+                {/* 新規性の内訳 */}
+                <div className="pl-6 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-foreground flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-primary" />
+                      新規性: {idea.evaluationBreakdown.novelty.total}/100
+                    </span>
+                  </div>
+                  <div className="space-y-2">
+                    {idea.evaluationBreakdown.novelty.criteria.map((criterion, i) => (
+                      <div key={i} className="space-y-1">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-muted-foreground">
+                            {criterion.name}（{criterion.rationale}）
+                          </span>
+                          <span className="text-foreground font-medium">{criterion.score}/{criterion.maxScore}</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
+                          <div 
+                            className="h-full bg-primary rounded-full transition-all"
+                            style={{ width: `${(criterion.score / criterion.maxScore) * 100}%` }}
+                          />
+                        </div>
                       </div>
                     ))}
                   </div>

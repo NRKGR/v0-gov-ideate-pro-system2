@@ -79,6 +79,10 @@ export interface EvaluationBreakdown {
     total: number;
     criteria: EvaluationCriterion[];
   };
+  novelty: {
+    total: number;
+    criteria: EvaluationCriterion[];
+  };
 }
 
 export interface ScoredIdea extends Idea {
@@ -740,7 +744,8 @@ const ideaTitles: Record<string, string[]> = {
 function generateEvaluationBreakdown(
   category: string,
   feasibilityTotal: number,
-  impactTotal: number
+  impactTotal: number,
+  noveltyTotal: number
 ): EvaluationBreakdown {
   // 実現可能性の評価軸テンプレート
   const feasibilityTemplates: Record<string, { name: string; rationales: { high: string; low: string } }[]> = {
@@ -790,7 +795,7 @@ function generateEvaluationBreakdown(
       { name: '政策優先度', rationales: { high: 'EBPM推進の中核施策', low: '優先度は中程度' } },
       { name: '波及効果', rationales: { high: '全省庁の政策立案に貢献', low: '波及範囲は限定的' } },
     ],
-    'default': [
+'default': [
       { name: '対象人数', rationales: { high: '広範な対象に影響', low: '対象は限定的' } },
       { name: '業務効率化効果', rationales: { high: '大幅な効率化が期待', low: '効果は限定的' } },
       { name: '政策優先度', rationales: { high: '政策方針と強く合致', low: '優先度は中程度' } },
@@ -798,8 +803,37 @@ function generateEvaluationBreakdown(
     ],
   };
 
+  // 新規性の評価軸テンプレート
+  const noveltyTemplates: Record<string, { name: string; rationales: { high: string; low: string } }[]> = {
+    'AI・自動化': [
+      { name: '技術的独自性', rationales: { high: '最新AI技術の先進的活用', low: '既存技術の標準的活用' } },
+      { name: '行政での前例', rationales: { high: '国内行政で前例のない取組', low: '他自治体で類似事例あり' } },
+      { name: 'アプローチの斬新さ', rationales: { high: '従来にない課題解決手法', low: '既存手法の改善' } },
+      { name: '将来発展性', rationales: { high: '次世代技術への発展余地大', low: '技術的発展は限定的' } },
+    ],
+    '市民サービス': [
+      { name: '技術的独自性', rationales: { high: 'UX/UIに革新的アプローチ', low: '標準的なサービス設計' } },
+      { name: '行政での前例', rationales: { high: '全国初のサービスモデル', low: '先行自治体の事例を参考' } },
+      { name: 'アプローチの斬新さ', rationales: { high: '住民接点の抜本的変革', low: '既存サービスの改善' } },
+      { name: '将来発展性', rationales: { high: '他サービスへの展開可能', low: '単独サービスとして完結' } },
+    ],
+    'データ活用': [
+      { name: '技術的独自性', rationales: { high: '独自の分析手法を開発', low: '既存分析手法を適用' } },
+      { name: '行政での前例', rationales: { high: '行政データ活用の新領域', low: '他機関で実績あり' } },
+      { name: 'アプローチの斬新さ', rationales: { high: '複数データの革新的統合', low: '単一データソースの分析' } },
+      { name: '将来発展性', rationales: { high: 'AI/ML活用への発展性', low: '現状分析に留まる' } },
+    ],
+    'default': [
+      { name: '技術的独自性', rationales: { high: '独自技術・手法を採用', low: '既存手法を活用' } },
+      { name: '行政での前例', rationales: { high: '行政分野で前例なし', low: '類似事例が存在' } },
+      { name: 'アプローチの斬新さ', rationales: { high: '新しい視点からの提案', low: '既存の延長線上' } },
+      { name: '将来発展性', rationales: { high: '将来的な発展余地大', low: '発展性は限定的' } },
+    ],
+  };
+
   const feasibilityAxes = feasibilityTemplates[category] || feasibilityTemplates['default'];
   const impactAxes = impactTemplates[category] || impactTemplates['default'];
+  const noveltyAxes = noveltyTemplates[category] || noveltyTemplates['default'];
 
   // 各軸のスコアを生成（合計がtotalに近くなるように調整）
   const generateCriteria = (
@@ -832,6 +866,10 @@ function generateEvaluationBreakdown(
     impact: {
       total: impactTotal,
       criteria: generateCriteria(impactAxes, impactTotal),
+    },
+    novelty: {
+      total: noveltyTotal,
+      criteria: generateCriteria(noveltyAxes, noveltyTotal),
     },
   };
 }
@@ -889,7 +927,8 @@ export function generate300Ideas(): ScoredIdea[] {
       const evaluationBreakdown = generateEvaluationBreakdown(
         template.category,
         feasibility,
-        impact
+        impact,
+        novelty
       );
       
       ideas.push({
@@ -1179,7 +1218,7 @@ export function generateIdeaDetails(idea: ScoredIdea): IdeaDetails {
     ],
     '防災・危機管理': [
       '国土強靱化基本計画',
-      '防災基本計画',
+      '防災��本計画',
       '災害対策基本法',
     ],
     'デジタルデバイド対策': [
