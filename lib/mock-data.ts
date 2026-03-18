@@ -791,7 +791,7 @@ function generateEvaluationBreakdown(
       { name: '波及効果', rationales: { high: '全省庁の政策立案に貢献', low: '波及範囲は限定���' } },
     ],
 'default': [
-      { name: '対象人数', rationales: { high: '広範な対��に影響', low: '対象は限定的' } },
+      { name: '対象人数', rationales: { high: '��範な対��に影響', low: '対象は限定的' } },
       { name: '業務効率化効果', rationales: { high: '大幅な効率化が期待', low: '効果は限定的' } },
       { name: '政策優先度', rationales: { high: '政策方針と強く合致', low: '優先度は中程度' } },
       { name: '波及効果', rationales: { high: '幅広い波及効果', low: '波及効果は限定的' } },
@@ -854,29 +854,30 @@ export function generate300Ideas(): ScoredIdea[] {
       const baseTitle = titles[titleIndex];
       const title = variant > 1 ? `${baseTitle} v${variant}` : baseTitle;
       
-      // Distribute across all 4 quadrants evenly (threshold at 50/50)
+      // AIが質の高いアイデアを生成した場合の現実的な分布
+      // 優先実施: 15%, 戦略検討: 28%, 継続改善: 32%, 見送り検討: 25%
       const quadrantSeed = Math.random();
       let feasibility: number;
       let impact: number;
       let quadrant: ScoredIdea['quadrant'];
       
-      if (quadrantSeed < 0.25) {
-        // Quick Win: high feasibility (>=50), high impact (>=50)
+      if (quadrantSeed < 0.15) {
+        // 優先実施（Quick Win）: 15% - 影響大 + 実現容易（約45案）
         feasibility = Math.floor(Math.random() * 45) + 52; // 52-97
         impact = Math.floor(Math.random() * 45) + 52; // 52-97
         quadrant = 'quick-win';
-      } else if (quadrantSeed < 0.5) {
-        // Moonshot: low feasibility (<50), high impact (>=50)
+      } else if (quadrantSeed < 0.43) {
+        // 戦略検討（Moonshot）: 28% - 影響大 + 実現困難（約84案）
         feasibility = Math.floor(Math.random() * 45) + 5; // 5-50
         impact = Math.floor(Math.random() * 45) + 52; // 52-97
         quadrant = 'moonshot';
       } else if (quadrantSeed < 0.75) {
-        // Sustainable Core: high feasibility (>=50), low impact (<50)
+        // 継続改善（Sustainable Core）: 32% - 影響小 + 実現容易（約96案）
         feasibility = Math.floor(Math.random() * 45) + 52; // 52-97
         impact = Math.floor(Math.random() * 45) + 5; // 5-50
         quadrant = 'core';
       } else {
-        // Low Priority: low feasibility (<50), low impact (<50)
+        // 見送り検討（Low Priority）: 25% - 影響小 + 実現困難（約75案）
         feasibility = Math.floor(Math.random() * 45) + 5; // 5-50
         impact = Math.floor(Math.random() * 45) + 5; // 5-50
         quadrant = 'low-priority';
@@ -914,7 +915,7 @@ export function generate300Ideas(): ScoredIdea[] {
 }
 
 export function exportIdeasToCSV(ideas: ScoredIdea[]): string {
-  const headers = ['ID', 'タイトル', '説明', 'カテゴリ', '実現可能性', 'インパクト', '独自性', '総合スコア', '象限', 'タグ', '評価理由'];
+  const headers = ['ID', 'タ��トル', '説明', 'カテゴリ', '実現可能性', 'インパクト', '独自性', '総合スコア', '象限', 'タグ', '評価理由'];
   
   const rows = ideas.map(idea => [
     idea.id,
