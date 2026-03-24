@@ -228,7 +228,7 @@ export const mockIdeas: Idea[] = [
   {
     id: '2',
     title: '行政文書自動要約・検索システム',
-    description: '膨大な行政文書をAIが自動要約し、意味検索を可能にする。過去の政策資料や議事録から関連情報を瞬時に抽出し、政策立案の効率を大幅に向上。',
+    description: '膨大な行政文書をAIが自動要約し、意味検索を可能にする。過���の政策資料や議事録から関連情報を瞬時に抽出し、政策立案の効率を大幅に向上。',
     category: 'AI・自動化',
     feasibility: 80,
     impact: 78,
@@ -794,7 +794,7 @@ function generateEvaluationBreakdown(
       { name: '政策優先度', rationales: { high: '住民サービス向上の最重要施策', low: '優先度は相対的に低い' } },
       { name: '波及効果', rationales: { high: '住民満足度向上に直結', low: '波及効果は限定的' } },
     ],
-    'データ活用': [
+    'データ活��': [
       { name: '対象人数', rationales: { high: '政策立案者全体に影響', low: '特定分野のみに影響' } },
       { name: '業務効率化効果', rationales: { high: '意思決定の質を大幅向上', low: '改善効果は限定的' } },
       { name: '政策優先度', rationales: { high: 'EBPM推進の中核施策', low: '優先度は中程度' } },
@@ -869,31 +869,36 @@ export function generate300Ideas(): ScoredIdea[] {
       const quadrantSeed = Math.random();
       let feasibility: number;
       let impact: number;
+      let novelty: number;
       let quadrant: ScoredIdea['quadrant'];
       
       if (quadrantSeed < 0.15) {
-        // 優先実施（Quick Win）: 15% - 影響大 + 実現容易（約45案）
-        feasibility = Math.floor(Math.random() * 45) + 52; // 52-97
-        impact = Math.floor(Math.random() * 45) + 52; // 52-97
+        // 優先実施（Quick Win）: 15% - 高スコア帯（約45案）
+        // トップ層は90代が出るように調整
+        feasibility = Math.floor(Math.random() * 15) + 85; // 85-100
+        impact = Math.floor(Math.random() * 15) + 85; // 85-100
+        novelty = Math.floor(Math.random() * 15) + 80; // 80-95
         quadrant = 'quick-win';
       } else if (quadrantSeed < 0.43) {
         // 戦略検討（Moonshot）: 28% - 影響大 + 実現困難（約84案）
-        feasibility = Math.floor(Math.random() * 45) + 5; // 5-50
-        impact = Math.floor(Math.random() * 45) + 52; // 52-97
+        feasibility = Math.floor(Math.random() * 35) + 15; // 15-50
+        impact = Math.floor(Math.random() * 20) + 75; // 75-95
+        novelty = Math.floor(Math.random() * 25) + 65; // 65-90
         quadrant = 'moonshot';
       } else if (quadrantSeed < 0.75) {
         // 継続改善（Sustainable Core）: 32% - 影響小 + 実現容易（約96案）
-        feasibility = Math.floor(Math.random() * 45) + 52; // 52-97
-        impact = Math.floor(Math.random() * 45) + 5; // 5-50
+        feasibility = Math.floor(Math.random() * 20) + 75; // 75-95
+        impact = Math.floor(Math.random() * 35) + 25; // 25-60
+        novelty = Math.floor(Math.random() * 25) + 50; // 50-75
         quadrant = 'core';
       } else {
         // 見送り検討（Low Priority）: 25% - 影響小 + 実現困難（約75案）
-        feasibility = Math.floor(Math.random() * 45) + 5; // 5-50
-        impact = Math.floor(Math.random() * 45) + 5; // 5-50
+        feasibility = Math.floor(Math.random() * 35) + 15; // 15-50
+        impact = Math.floor(Math.random() * 35) + 15; // 15-50
+        novelty = Math.floor(Math.random() * 30) + 40; // 40-70
         quadrant = 'low-priority';
       }
       
-      const novelty = Math.floor(Math.random() * 40) + 40; // 40-80
       const totalScore = Math.round((feasibility + impact + novelty) / 3);
       
       // 評価根拠を生成
