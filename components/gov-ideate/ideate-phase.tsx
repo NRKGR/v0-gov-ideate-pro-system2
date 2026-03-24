@@ -60,15 +60,19 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
     return counts;
   }, [allIdeas]);
   
-  // フィルタリングされたアイデア
+  // スコア上位5案を取得（フィルタリング後）
   const filteredIdeas = useMemo(() => {
-    return allIdeas.filter(idea => {
+    const filtered = allIdeas.filter(idea => {
       const matchesSearch = searchQuery === '' || 
         idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         idea.description.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesCategory = selectedCategory === null || idea.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
+    // スコア降順でソートして上位5案を返す
+    return filtered
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5);
   }, [allIdeas, searchQuery, selectedCategory]);
   
   const handleExportCSV = useCallback(() => {
@@ -217,14 +221,14 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" />
-                    <h4 className="font-semibold text-foreground">アイデア一覧</h4>
+                    <h4 className="font-semibold text-foreground">スコア上位5案</h4>
                   </div>
-                  <Badge variant="outline">{filteredIdeas.length}件 / 300件</Badge>
+                  <Badge variant="outline">上位5件 / 300件</Badge>
                 </div>
                 
                 {/* アイデアリスト */}
                 <div className="grid gap-4">
-                  {filteredIdeas.slice(0, displayCount).map((idea, index) => (
+                  {filteredIdeas.map((idea, index) => (
                     <div key={idea.id} className="flex items-start gap-2">
                       <span className="text-xs font-medium text-muted-foreground w-6 pt-4">
                         {index + 1}.
@@ -240,18 +244,6 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                     </div>
                   ))}
                 </div>
-                
-                {/* もっと見るボタン */}
-                {displayCount < filteredIdeas.length && (
-                  <div className="flex justify-center pt-2">
-                    <Button
-                      variant="outline"
-                      onClick={() => setDisplayCount(prev => Math.min(prev + 20, filteredIdeas.length))}
-                    >
-                      もっと見る（残り {filteredIdeas.length - displayCount} 件）
-                    </Button>
-                  </div>
-                )}
               </div>
             )}
             
