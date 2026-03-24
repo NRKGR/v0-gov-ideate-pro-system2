@@ -9,7 +9,6 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { AgentCard } from './agent-card';
 import { IdeaCard } from './idea-card';
-import { PayoffMatrix } from './payoff-matrix';
 import { generate300Ideas, exportIdeasToCSV, downloadCSV, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeatePhaseProps {
@@ -139,18 +138,6 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                 </div>
               </div>
             </div>
-            
-            {/* Payoff Matrix - 300 ideas */}
-            {showIdeas && allIdeas.length > 0 && (
-              <div className="space-y-3 fade-in-up">
-                <h4 className="font-semibold text-foreground">ペイオフマトリクス（300案全体）</h4>
-                <PayoffMatrix
-                  ideas={allIdeas}
-                  selectedIdea={selectedIdea}
-                  onIdeaSelect={onIdeaSelect}
-                />
-              </div>
-            )}
             
             {/* カテゴリ別集計 */}
             {showIdeas && (
