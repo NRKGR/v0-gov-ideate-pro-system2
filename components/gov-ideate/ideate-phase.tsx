@@ -221,28 +221,44 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" />
-                    <h4 className="font-semibold text-foreground">スコア上位5案</h4>
+                    <h4 className="font-semibold text-foreground">スコアランキング TOP5</h4>
                   </div>
-                  <Badge variant="outline">上位5件 / 300件</Badge>
+                  <Badge variant="outline" className="gap-1">
+                    総合スコア順
+                  </Badge>
                 </div>
                 
-                {/* アイデアリスト */}
+                {/* アイデアリスト - ランキング形式 */}
                 <div className="grid gap-4">
-                  {filteredIdeas.map((idea, index) => (
-                    <div key={idea.id} className="flex items-start gap-2">
-                      <span className="text-xs font-medium text-muted-foreground w-6 pt-4">
-                        {index + 1}.
-                      </span>
-                      <div className="flex-1">
-                        <IdeaCard 
-                          idea={idea} 
-                          variant="full"
-                          isSelected={selectedIdea?.id === idea.id}
-                          onSelect={onIdeaSelect}
-                        />
+                  {filteredIdeas.map((idea, index) => {
+                    const rank = index + 1;
+                    const rankStyles = {
+                      1: 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white shadow-lg shadow-amber-500/30',
+                      2: 'bg-gradient-to-br from-slate-300 to-slate-400 text-white shadow-lg shadow-slate-400/30',
+                      3: 'bg-gradient-to-br from-orange-400 to-orange-500 text-white shadow-lg shadow-orange-500/30',
+                    };
+                    const defaultRankStyle = 'bg-muted text-muted-foreground';
+                    
+                    return (
+                      <div key={idea.id} className="flex items-start gap-3">
+                        {/* ランキングバッジ */}
+                        <div className={cn(
+                          "flex h-10 w-10 shrink-0 items-center justify-center rounded-full font-bold text-lg mt-3",
+                          rankStyles[rank as keyof typeof rankStyles] || defaultRankStyle
+                        )}>
+                          {rank}
+                        </div>
+                        <div className="flex-1">
+                          <IdeaCard 
+                            idea={idea} 
+                            variant="full"
+                            isSelected={selectedIdea?.id === idea.id}
+                            onSelect={onIdeaSelect}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}
