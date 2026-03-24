@@ -171,36 +171,46 @@ export const mockResearchOutput: ResearchOutput = {
     ],
   },
   budgetInfo: {
-    totalBudget: '約5,000億円（令和8年度）',
+    totalBudget: '約6,143億円（令和8年度概算要求）',
     relatedPrograms: [
-      { name: 'ガバメントクラウド整備', amount: '約800億円' },
-      { name: '地方公共団体情報システム標準化', amount: '約1,200億円' },
-      { name: 'マイナンバー関連施策', amount: '約600億円' },
-      { name: 'デジタル田園都市国家構想', amount: '約1,500億円' },
+      { name: '情報システム整備・運用', amount: '約5,929億円' },
+      { name: 'ガバメントAI基盤構築', amount: '約50億円' },
+      { name: '生成AI利活用環境整備', amount: '約2.2億円（新規）' },
+      { name: 'マイナンバー関連施策', amount: '約160億円' },
     ],
   },
   macroThemes: [
     {
-      title: 'データ駆動型行政の実現',
-      description: 'EBPM（証拠に基づく政策立案）の推進と、省庁横断的なデータ利活用基盤の構築',
-      keywords: ['EBPM', 'データ連携', 'オープンデータ', 'ダッシュボード'],
+      title: 'AI・デジタル技術の徹底活用',
+      description: '政府AI基盤（ガバメントAI）の構築と、行政サービス全般へのAI導入推進',
+      keywords: ['ガバメントAI', '生成AI', 'LLM', '業務自動化'],
     },
     {
-      title: '誰一人取り残さないデジタル化',
-      description: 'デジタルデバイドの解消と、アクセシビリティに配慮したサービス設計',
-      keywords: ['アクセシビリティ', 'UI/UX', 'デジタル支援員', '多言語対応'],
+      title: 'AI-フレンドリーな環境整備',
+      description: 'AIが活用しやすい制度・データ・インフラの整備とベース・レジストリの拡充',
+      keywords: ['ベース・レジストリ', 'データ標準化', 'API連携', 'オープンデータ'],
+    },
+    {
+      title: '競争・成長のための協調',
+      description: '準公共分野（医療・教育・防災等）のデジタル化と官民データ連携',
+      keywords: ['準公共分野', '医療DX', '教育DX', '官民連携'],
     },
     {
       title: '安全・安心なデジタル社会',
-      description: 'サイバーセキュリティの強化と、個人情報保護の徹底',
+      description: 'サイバーセキュリティの強化と、プライバシー保護の徹底',
       keywords: ['サイバーセキュリティ', 'ゼロトラスト', 'プライバシー', '認証基盤'],
+    },
+    {
+      title: 'DX推進力の強化',
+      description: 'デジタル人材の確保・育成と、デジタルデバイド対策の推進',
+      keywords: ['デジタル人材', '人材育成', 'デジタルデバイド', 'リスキリング'],
     },
   ],
   timeline: [
-    { year: '2024', milestone: '地方公共団体の基幹業務システム標準化着手' },
-    { year: '2025', milestone: 'ガバメントクラウド本格稼働' },
+    { year: '2025', milestone: 'ガバメントクラウド本格稼働・AI基盤構築着手' },
     { year: '2026', milestone: '行政手続きオンライン化率98%達成目標' },
-    { year: '2027', milestone: 'デジタル・ガバメント実行計画最終評価' },
+    { year: '2027', milestone: 'ガバメントAI全省庁展開・地方自治体システム標準化完了' },
+    { year: '2028', milestone: 'AI駆動型行政サービス本格運用開始' },
   ],
 };
 
@@ -791,7 +801,7 @@ function generateEvaluationBreakdown(
       { name: '波及効果', rationales: { high: '全省庁の政策立案に貢献', low: '波及範囲は限定���' } },
     ],
 'default': [
-      { name: '対象人数', rationales: { high: '��範な対��に影響', low: '対象は限定的' } },
+      { name: '対象人数', rationales: { high: '���範な対��に影響', low: '対象は限定的' } },
       { name: '業務効率化効果', rationales: { high: '大幅な効率化が期待', low: '効果は限定的' } },
       { name: '政策優先度', rationales: { high: '政策方針と強く合致', low: '優先度は中程度' } },
       { name: '波及効果', rationales: { high: '幅広い波及効果', low: '波及効果は限定的' } },
@@ -1186,7 +1196,7 @@ export function generateIdeaDetails(idea: ScoredIdea): IdeaDetails {
     'デジタルデバイド対策': [
       'デジタル活用支援推進事業',
       '高齢社会対策大綱',
-      '障害者基本計画',
+      '障害���基本計画',
     ],
     'セキュリティ': [
       'サイバーセキュリティ戦略',
