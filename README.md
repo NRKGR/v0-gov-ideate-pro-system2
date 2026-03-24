@@ -1,5 +1,7 @@
 # v0-gov-ideate-pro-system
 
+Government Ideation Pro System - A comprehensive ideation and innovation management platform.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
 
 ## Built with v0
