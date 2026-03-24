@@ -1,14 +1,14 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { Sparkles, ArrowRight, CheckCircle2, Download } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Sparkles, ArrowRight, CheckCircle2, Download, Search, Filter } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { Input } from '@/components/ui/input';
 import { AgentCard } from './agent-card';
 import { IdeaCard } from './idea-card';
-import { IdeasListModal } from './ideas-list-modal';
 import { PayoffMatrix } from './payoff-matrix';
 import { generate300Ideas, exportIdeasToCSV, downloadCSV, type ScoredIdea } from '@/lib/mock-data';
 
@@ -20,23 +20,57 @@ interface IdeatePhaseProps {
   className?: string;
 }
 
+// カテゴリ一覧（デジタル庁の5本柱に対応）
+const CATEGORIES = [
+  'AI・自動化',
+  '市民サービス',
+  'データ活用',
+  '防災・危機管理',
+  'デジタルデバイド対策',
+  'セキュリティ',
+  '知識共有',
+  '業務効率化',
+];
+
 export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, className }: IdeatePhaseProps) {
   const [generationProgress, setGenerationProgress] = useState(0);
   const [isGenerating, setIsGenerating] = useState(true);
   const [showIdeas, setShowIdeas] = useState(false);
   const [allIdeas, setAllIdeas] = useState<ScoredIdea[]>([]);
-  const [top20Ideas, setTop20Ideas] = useState<ScoredIdea[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [displayCount, setDisplayCount] = useState(20);
   
   // Generate all 300 ideas once when generation completes
   useEffect(() => {
     if (!isGenerating && allIdeas.length === 0) {
       const generated = generate300Ideas();
       setAllIdeas(generated);
-      // Sort by totalScore descending and get top 20
-      const sorted = [...generated].sort((a, b) => b.totalScore - a.totalScore);
-      setTop20Ideas(sorted.slice(0, 20));
     }
   }, [isGenerating, allIdeas.length]);
+  
+  // カテゴリ別集計
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    CATEGORIES.forEach(cat => counts[cat] = 0);
+    allIdeas.forEach(idea => {
+      if (counts[idea.category] !== undefined) {
+        counts[idea.category]++;
+      }
+    });
+    return counts;
+  }, [allIdeas]);
+  
+  // フィルタリングされたアイデア
+  const filteredIdeas = useMemo(() => {
+    return allIdeas.filter(idea => {
+      const matchesSearch = searchQuery === '' || 
+        idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        idea.description.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesCategory = selectedCategory === null || idea.category === selectedCategory;
+      return matchesSearch && matchesCategory;
+    });
+  }, [allIdeas, searchQuery, selectedCategory]);
   
   const handleExportCSV = useCallback(() => {
     const ideasToExport = allIdeas.length > 0 ? allIdeas : generate300Ideas();
@@ -90,11 +124,6 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <IdeasListModal
-                    ideas={allIdeas}
-                    selectedIdea={selectedIdea}
-                    onIdeaSelect={onIdeaSelect}
-                  />
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -110,17 +139,35 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                 </div>
               </div>
               
+              {/* カテゴリ別集計 */}
               <div className="grid grid-cols-4 gap-3">
-                {[
-                  { label: 'AI・自動化', count: 78 },
-                  { label: '市民サービス', count: 65 },
-                  { label: 'データ活用', count: 52 },
-                  { label: 'その他', count: 105 },
-                ].map((cat) => (
-                  <div key={cat.label} className="glass-card p-3 text-center">
-                    <p className="text-xl font-bold text-foreground">{cat.count}</p>
-                    <p className="text-xs text-muted-foreground">{cat.label}</p>
-                  </div>
+                {CATEGORIES.slice(0, 4).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                    className={cn(
+                      "glass-card p-3 text-center transition-all cursor-pointer hover:border-primary/50",
+                      selectedCategory === cat && "border-primary bg-primary/10"
+                    )}
+                  >
+                    <p className="text-xl font-bold text-foreground">{categoryCounts[cat] || 0}</p>
+                    <p className="text-xs text-muted-foreground">{cat}</p>
+                  </button>
+                ))}
+              </div>
+              <div className="grid grid-cols-4 gap-3">
+                {CATEGORIES.slice(4).map((cat) => (
+                  <button
+                    key={cat}
+                    onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                    className={cn(
+                      "glass-card p-3 text-center transition-all cursor-pointer hover:border-primary/50",
+                      selectedCategory === cat && "border-primary bg-primary/10"
+                    )}
+                  >
+                    <p className="text-xl font-bold text-foreground">{categoryCounts[cat] || 0}</p>
+                    <p className="text-xs text-muted-foreground">{cat}</p>
+                  </button>
                 ))}
               </div>
             </div>
@@ -137,36 +184,84 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
               </div>
             )}
             
-            {/* Top 20 Ideas */}
+            {/* 300案一覧（検索・フィルタ付き） */}
             {showIdeas && (
-              <div className="space-y-3 fade-in-up">
-                <div className="flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-primary" />
-                  <h4 className="font-semibold text-foreground">上位20案</h4>
-                  <Badge variant="outline" className="ml-2">スコア順</Badge>
+              <div className="space-y-4 fade-in-up">
+                {/* 検索・フィルタ */}
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="relative flex-1 min-w-[200px]">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="アイデアを検索..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-9"
+                    />
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <Button
+                      variant={selectedCategory === null ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => setSelectedCategory(null)}
+                    >
+                      すべて
+                    </Button>
+                    {selectedCategory && (
+                      <Badge variant="secondary" className="gap-1">
+                        {selectedCategory}
+                        <button 
+                          onClick={() => setSelectedCategory(null)}
+                          className="ml-1 hover:text-foreground"
+                        >
+                          ×
+                        </button>
+                      </Badge>
+                    )}
+                  </div>
                 </div>
+                
+                {/* ヘッダー */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Sparkles className="h-4 w-4 text-primary" />
+                    <h4 className="font-semibold text-foreground">アイデア一覧</h4>
+                  </div>
+                  <Badge variant="outline">{filteredIdeas.length}件 / 300件</Badge>
+                </div>
+                
+                {/* アイデアリスト */}
                 <div className="grid gap-4">
-                  {top20Ideas.map((idea, index) => (
-                    <div key={idea.id} className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-medium text-muted-foreground w-6">
-                          {index + 1}.
-                        </span>
-                        <div className="flex-1">
-                          <IdeaCard 
-                            idea={idea} 
-                            variant="full"
-                            isSelected={selectedIdea?.id === idea.id}
-                            onSelect={onIdeaSelect}
-                          />
-                        </div>
+                  {filteredIdeas.slice(0, displayCount).map((idea, index) => (
+                    <div key={idea.id} className="flex items-start gap-2">
+                      <span className="text-xs font-medium text-muted-foreground w-6 pt-4">
+                        {index + 1}.
+                      </span>
+                      <div className="flex-1">
+                        <IdeaCard 
+                          idea={idea} 
+                          variant="full"
+                          isSelected={selectedIdea?.id === idea.id}
+                          onSelect={onIdeaSelect}
+                        />
                       </div>
                     </div>
                   ))}
                 </div>
+                
+                {/* もっと見るボタン */}
+                {displayCount < filteredIdeas.length && (
+                  <div className="flex justify-center pt-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setDisplayCount(prev => Math.min(prev + 20, filteredIdeas.length))}
+                    >
+                      もっと見る（残り {filteredIdeas.length - displayCount} 件）
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
-                      
             
             {/* Next Phase Button */}
             <div className="flex justify-end pt-4">
