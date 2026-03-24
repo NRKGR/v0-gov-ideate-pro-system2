@@ -110,7 +110,7 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
         {!isGenerating && (
           <div className="space-y-6">
             {/* Generation Summary */}
-            <div className="glass-card p-4 space-y-4">
+            <div className="glass-card p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-score-high/20">
@@ -138,41 +138,9 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                   </Badge>
                 </div>
               </div>
-              
-              {/* カテゴリ別集計 */}
-              <div className="grid grid-cols-4 gap-3">
-                {CATEGORIES.slice(0, 4).map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-                    className={cn(
-                      "glass-card p-3 text-center transition-all cursor-pointer hover:border-primary/50",
-                      selectedCategory === cat && "border-primary bg-primary/10"
-                    )}
-                  >
-                    <p className="text-xl font-bold text-foreground">{categoryCounts[cat] || 0}</p>
-                    <p className="text-xs text-muted-foreground">{cat}</p>
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-4 gap-3">
-                {CATEGORIES.slice(4).map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
-                    className={cn(
-                      "glass-card p-3 text-center transition-all cursor-pointer hover:border-primary/50",
-                      selectedCategory === cat && "border-primary bg-primary/10"
-                    )}
-                  >
-                    <p className="text-xl font-bold text-foreground">{categoryCounts[cat] || 0}</p>
-                    <p className="text-xs text-muted-foreground">{cat}</p>
-                  </button>
-                ))}
-              </div>
             </div>
             
-{/* Payoff Matrix - 300 ideas */}
+            {/* Payoff Matrix - 300 ideas */}
             {showIdeas && allIdeas.length > 0 && (
               <div className="space-y-3 fade-in-up">
                 <h4 className="font-semibold text-foreground">ペイオフマトリクス（300案全体）</h4>
@@ -181,6 +149,43 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                   selectedIdea={selectedIdea}
                   onIdeaSelect={onIdeaSelect}
                 />
+              </div>
+            )}
+            
+            {/* カテゴリ別集計 */}
+            {showIdeas && (
+              <div className="space-y-3 fade-in-up">
+                <h4 className="font-semibold text-foreground">カテゴリ別集計</h4>
+                <div className="grid grid-cols-4 gap-3">
+                  {CATEGORIES.slice(0, 4).map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                      className={cn(
+                        "glass-card p-3 text-center transition-all cursor-pointer hover:border-primary/50",
+                        selectedCategory === cat && "border-primary bg-primary/10"
+                      )}
+                    >
+                      <p className="text-xl font-bold text-foreground">{categoryCounts[cat] || 0}</p>
+                      <p className="text-xs text-muted-foreground">{cat}</p>
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-4 gap-3">
+                  {CATEGORIES.slice(4).map((cat) => (
+                    <button
+                      key={cat}
+                      onClick={() => setSelectedCategory(selectedCategory === cat ? null : cat)}
+                      className={cn(
+                        "glass-card p-3 text-center transition-all cursor-pointer hover:border-primary/50",
+                        selectedCategory === cat && "border-primary bg-primary/10"
+                      )}
+                    >
+                      <p className="text-xl font-bold text-foreground">{categoryCounts[cat] || 0}</p>
+                      <p className="text-xs text-muted-foreground">{cat}</p>
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
             
