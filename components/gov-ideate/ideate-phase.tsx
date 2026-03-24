@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Sparkles, ArrowRight, CheckCircle2, Download, Search, Filter } from 'lucide-react';
+import { Sparkles, ArrowRight, CheckCircle2, Download, Search, Filter, ChevronDown, ChevronUp, List } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,7 @@ import { Progress } from '@/components/ui/progress';
 import { Input } from '@/components/ui/input';
 import { AgentCard } from './agent-card';
 import { IdeaCard } from './idea-card';
+import { IdeasListModal } from './ideas-list-modal';
 import { generate300Ideas, exportIdeasToCSV, downloadCSV, type ScoredIdea } from '@/lib/mock-data';
 
 interface IdeatePhaseProps {
@@ -38,7 +39,8 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
   const [allIdeas, setAllIdeas] = useState<ScoredIdea[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [displayCount, setDisplayCount] = useState(20);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [loadedCount, setLoadedCount] = useState(20);
   
   // Generate all 300 ideas once when generation completes
   useEffect(() => {
@@ -60,8 +62,8 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
     return counts;
   }, [allIdeas]);
   
-  // スコア上位5案を取得（フィルタリング後）
-  const filteredIdeas = useMemo(() => {
+  // フィルタリング・ソート済みの全アイデア
+  const sortedFilteredIdeas = useMemo(() => {
     const filtered = allIdeas.filter(idea => {
       const matchesSearch = searchQuery === '' || 
         idea.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -69,11 +71,21 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
       const matchesCategory = selectedCategory === null || idea.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-    // スコア降順でソートして上位5案を返す
-    return filtered
-      .sort((a, b) => b.totalScore - a.totalScore)
-      .slice(0, 5);
+    // スコア降順でソート
+    return filtered.sort((a, b) => b.totalScore - a.totalScore);
   }, [allIdeas, searchQuery, selectedCategory]);
+  
+  // 上位5案
+  const top5Ideas = useMemo(() => sortedFilteredIdeas.slice(0, 5), [sortedFilteredIdeas]);
+  
+  // 残りのアイデア（6位以降）
+  const remainingIdeas = useMemo(() => {
+    const remaining = sortedFilteredIdeas.slice(5);
+    return remaining.slice(0, loadedCount);
+  }, [sortedFilteredIdeas, loadedCount]);
+  
+  const totalRemaining = sortedFilteredIdeas.length - 5;
+  const hasMoreToLoad = remainingIdeas.length < totalRemaining;
   
   const handleExportCSV = useCallback(() => {
     const ideasToExport = allIdeas.length > 0 ? allIdeas : generate300Ideas();
@@ -127,6 +139,11 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
+                  <IdeasListModal 
+                    ideas={allIdeas} 
+                    selectedIdea={selectedIdea}
+                    onIdeaSelect={onIdeaSelect}
+                  />
                   <Button 
                     variant="outline" 
                     size="sm"
@@ -230,7 +247,7 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                 
                 {/* アイデアリスト - ランキング形式 */}
                 <div className="grid gap-4">
-                  {filteredIdeas.map((idea, index) => {
+                  {top5Ideas.map((idea, index) => {
                     const rank = index + 1;
                     const rankStyles = {
                       1: 'bg-gradient-to-br from-yellow-400 to-amber-500 text-white shadow-lg shadow-amber-500/30',
@@ -260,6 +277,86 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
                     );
                   })}
                 </div>
+                
+                {/* 残りのアイデア（折りたたみ） */}
+                {totalRemaining > 0 && (
+                  <div className="space-y-3 pt-2">
+                    <button
+                      onClick={() => setIsExpanded(!isExpanded)}
+                      className={cn(
+                        "w-full flex items-center justify-center gap-2 py-3 px-4 rounded-lg border border-dashed border-border",
+                        "hover:border-primary/50 hover:bg-muted/50 transition-all",
+                        "text-sm font-medium text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      {isExpanded ? (
+                        <>
+                          <ChevronUp className="h-4 w-4" />
+                          6位以降を閉じる
+                        </>
+                      ) : (
+                        <>
+                          <ChevronDown className="h-4 w-4" />
+                          他 {totalRemaining}件を表示（6位〜）
+                        </>
+                      )}
+                    </button>
+                    
+                    {isExpanded && (
+                      <div className="space-y-2 fade-in-up">
+                        {/* コンパクトリスト */}
+                        <div className="glass-card divide-y divide-border">
+                          {remainingIdeas.map((idea, index) => {
+                            const rank = index + 6;
+                            return (
+                              <div
+                                key={idea.id}
+                                onClick={() => onIdeaSelect?.(idea)}
+                                className={cn(
+                                  "flex items-center gap-3 p-3 cursor-pointer transition-colors hover:bg-muted/50",
+                                  selectedIdea?.id === idea.id && "bg-primary/10"
+                                )}
+                              >
+                                {/* 順位 */}
+                                <span className="w-8 text-sm font-medium text-muted-foreground text-right">
+                                  {rank}位
+                                </span>
+                                {/* スコア */}
+                                <span className={cn(
+                                  "w-10 text-sm font-bold",
+                                  idea.totalScore >= 75 ? 'text-score-high' :
+                                  idea.totalScore >= 60 ? 'text-score-medium' : 'text-score-low'
+                                )}>
+                                  {idea.totalScore}
+                                </span>
+                                {/* タイトル */}
+                                <span className="flex-1 text-sm font-medium text-foreground truncate">
+                                  {idea.title}
+                                </span>
+                                {/* カテゴリ */}
+                                <Badge variant="outline" className="text-xs shrink-0">
+                                  {idea.category}
+                                </Badge>
+                              </div>
+                            );
+                          })}
+                        </div>
+                        
+                        {/* もっと読み込むボタン */}
+                        {hasMoreToLoad && (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setLoadedCount(prev => prev + 20)}
+                            className="w-full"
+                          >
+                            さらに20件読み込む（残り {totalRemaining - remainingIdeas.length}件）
+                          </Button>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
             
