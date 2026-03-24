@@ -71,7 +71,7 @@ export function IdeatePhase({ ideas, selectedIdea, onIdeaSelect, onComplete, cla
     });
     // スコア降順でソートして上位5案を返す
     return filtered
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => b.totalScore - a.totalScore)
       .slice(0, 5);
   }, [allIdeas, searchQuery, selectedCategory]);
   
