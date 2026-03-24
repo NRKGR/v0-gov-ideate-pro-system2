@@ -4,6 +4,15 @@ import { useState } from 'react';
 import { Building2, Sparkles, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { ministries } from '@/lib/mock-data';
 
 interface InputFormProps {
   onSubmit: (ministry: string) => void;
@@ -11,16 +20,20 @@ interface InputFormProps {
 }
 
 export function InputForm({ onSubmit, className }: InputFormProps) {
+  const [selectedMinistry, setSelectedMinistry] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!selectedMinistry) return;
     
     setIsSubmitting(true);
     // Simulate a small delay for UX
     await new Promise((resolve) => setTimeout(resolve, 500));
-    onSubmit('digital'); // デジタル庁固定
+    onSubmit(selectedMinistry);
   };
+  
+  const isValid = !!selectedMinistry;
   
   return (
     <div className={cn('flex flex-col items-center justify-center min-h-[60vh]', className)}>
@@ -34,29 +47,43 @@ export function InputForm({ onSubmit, className }: InputFormProps) {
             新規事業アイデア創出
           </h2>
           <p className="text-muted-foreground max-w-md mx-auto">
-            デジタル庁の政策に基づき、5つのAIエージェントが協働して事業アイデアを創出します。
+            対象となる省庁を選択してください。
+            5つのAIエージェントが協働して事業アイデアを創出します。
           </p>
         </div>
         
         {/* Form */}
         <form onSubmit={handleSubmit} className="glass-card p-6 space-y-6">
-          {/* Target Ministry - Fixed to Digital Agency */}
+          {/* Ministry Selection */}
           <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <Label htmlFor="ministry" className="flex items-center gap-2 text-foreground">
               <Building2 className="h-4 w-4 text-primary" />
               対象省庁
-            </div>
-            <div className="h-12 px-4 flex items-center bg-background/50 border border-border rounded-md">
-              <span className="text-foreground font-medium">デジタル庁</span>
-              <span className="text-muted-foreground text-xs ml-2">(Digital Agency)</span>
-            </div>
+            </Label>
+            <Select value={selectedMinistry} onValueChange={setSelectedMinistry}>
+              <SelectTrigger id="ministry" className="h-12 bg-background/50">
+                <SelectValue placeholder="省庁を選択してください" />
+              </SelectTrigger>
+              <SelectContent>
+                {ministries.map((ministry) => (
+                  <SelectItem key={ministry.id} value={ministry.id}>
+                    <span className="flex items-center gap-2">
+                      <span>{ministry.name}</span>
+                      <span className="text-muted-foreground text-xs">
+                        ({ministry.nameEn})
+                      </span>
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           
           {/* Submit Button */}
           <Button
             type="submit"
             size="lg"
-            disabled={isSubmitting}
+            disabled={!isValid || isSubmitting}
             className="w-full h-12 text-base"
           >
             {isSubmitting ? (
